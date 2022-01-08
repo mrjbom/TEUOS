@@ -10,6 +10,9 @@ FLAGS     equ MBALIGN | MEMINFO \
             | GRAPHICSF          ; 'flags' field
 CHECKSUM  equ -(MAGIC + FLAGS)   ; checksum, value "which, when added to the other magic fields (i.e. ‘magic’ and ‘flags’), must have a 32-bit unsigned sum of zero."
 
+EGAWIDTH  equ 80                 ; number of the columns
+EGAHEIGHT equ 25                 ; number of the lines
+
 ; The bootloader will search for this signature in the first 8 KiB of the kernel file, aligned at a 32-bit boundary.
 ; The signature is in its own section so the header can be forced to be within the first 8 KiB of the kernel file.
 section .multiboot
@@ -25,8 +28,8 @@ dd 0
 dd 0
 ; Graphics fields
 dd 1
-dd 80
-dd 25
+dd EGAWIDTH
+dd EGAHEIGHT
 dd 0
 
 ; "The OS image must create its own stack as soon as it needs one."
@@ -56,8 +59,14 @@ _start:
 .end:
 
 section .rodata
+
 global stack_bottom_addr
 global stack_top_addr
-
 stack_bottom_addr dd stack_bottom
 stack_top_addr dd stack_top
+
+section .data
+global EGA_TEXTBUFFER_WIDTH
+global EGA_TEXTBUFFER_HEIGHT
+EGA_TEXTBUFFER_WIDTH db EGAWIDTH
+EGA_TEXTBUFFER_HEIGHT db EGAHEIGHT
