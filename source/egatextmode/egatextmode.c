@@ -25,6 +25,11 @@ static uint16_t ega_textbuffer_entry(uint8_t uch, uint8_t color)
 
 void ega_textbuffer_set_color(uint8_t fg, uint8_t bg)
 {
+    // The attribute byte carries the foreground colour in its lowest 4 bits and the background color in its highest 3 bits. The interpretation of bit #7 depends on how you (or the BIOS) configured the hardware
+    // TODO: When loading with GRUB, it draws a background of all 16 colors, which means #7 bit works without features, deal with it.
+    if(bg > (uint8_t)7/*0111b bg color*/) {
+        bg = 7;
+    }
     ega_textbuffer_color = (uint8_t)(fg | bg << 4);
 }
 
