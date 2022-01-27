@@ -31,14 +31,14 @@ LIBCKOBJS = $(LIBCFREEOBJFILES:.o=.libk.o)
 error:
 	$(error use "make all")
 
-$(LIBCOBJDIR):
-	mkdir -p $(LIBCOBJDIR)
-
-$(LIBCDIR)/libk.a: $(LIBCKOBJS)
+$(LIBCDIR)/libk.a: $(LIBCOBJDIR) $(LIBCKOBJS)
 	$(UTILSPATH)/$(LINKER) -r -o $@ $(LIBCKOBJS) $(LINKERFLAGS)
 
 $(LIBCOBJDIR)/strlen.libk.o: $(LIBCDIR)/string/strlen.c $(LIBCINCLUDEDIR)/string.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(LIBCKCFLAGS)
+
+$(LIBCOBJDIR):
+	mkdir -p $(LIBCOBJDIR)
 
 libcclean:
 	rm -r -f $(LIBCOBJDIR)

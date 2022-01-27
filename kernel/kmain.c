@@ -11,7 +11,7 @@
 #error "It is necessary to use the iX86 compiler"
 #endif
 #ifndef __i686__
-#error "It is supposed to be compiled using the i686 cross-compiler"
+#warning "It is supposed to be compiled using the i686 cross-compiler"
 #endif
 
 void kmain(void)
