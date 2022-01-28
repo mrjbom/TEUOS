@@ -1,4 +1,4 @@
-.PHONY: error buildlibc libcclean libcshowvars
+.PHONY: error libcclean libcshowvars
 
 #LIBCC - libc user-space part
 #LIBCK - libc(libk) kernel part
@@ -42,6 +42,7 @@ $(LIBCOBJDIR):
 
 libcclean:
 	rm -r -f $(LIBCOBJDIR)
+	rm -r -f $(LIBCKTARGET)
 
 libcshowvars:
 	@echo $(LIBCSRCFILES)
