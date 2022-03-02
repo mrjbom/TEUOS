@@ -32,7 +32,9 @@ CFLAGS = -g3 -std=gnu99 -ffreestanding -I$(LIBCINCLUDEDIR) $(WARNINGS)
 KERNELBINFILENAME = kernel-0.bin
 LINKER = i686-elf-gcc
 LINKERSCRIPTFILE = $(ARCHI386DIR)/linker.ld
-LINKERFLAGS = -ffreestanding -nostdlib -lgcc
+LINKERFLAGS = -ffreestanding -nostdlib -lgcc 
+#print memory map
+#-Wl,-Map=kernel.map
 
 CRTIOBJ = $(OBJDIR)/crti.o
 CRTBEGINOBJ = $(shell $(UTILSPATH)/$(CC) $(CFLAGS) -print-file-name=crtbegin.o)
@@ -59,7 +61,7 @@ $(ISODIR)/boot/grub/grub.cfg:
 	mkdir -p $(ISODIR)/boot/grub
 	touch $(ISODIR)/boot/grub/grub.cfg
 
-$(KERNELBINFILENAME): $(OBJDIR) $(ASMOBJFILES) $(COBJFILES) $(LIBCKTARGET)
+$(KERNELBINFILENAME): $(OBJDIR) $(LINKERSCRIPTFILE) $(ASMOBJFILES) $(COBJFILES) $(LIBCKTARGET)
 	$(UTILSPATH)/$(LINKER) -T $(LINKERSCRIPTFILE) -o $(KERNELBINFILENAME) \
 	$(CRTIOBJ) $(CRTBEGINOBJ) \
 	$(ASMOBJLINKFILES) \
@@ -103,3 +105,8 @@ showvars:
 	@echo $(ASMOBJLINKFILES)
 	@echo $(CSRCFILES)
 	@echo $(COBJFILES)
+
+QEMUFLAGS = -d int -no-reboot -m 128M -s -S -monitor stdio
+
+runqemu:
+	qemu-system-i386 $(QEMUFLAGS) $(BOOTABLEISOFILENAME)

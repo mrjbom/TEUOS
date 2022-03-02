@@ -26,7 +26,6 @@ enum ega_color {
 
 extern uint16_t* ega_textbuffer;
 
-//Declared in assembly _start
 extern const uint8_t EGA_TEXTBUFFER_WIDTH;
 extern const uint8_t EGA_TEXTBUFFER_HEIGHT;
 

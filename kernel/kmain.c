@@ -13,36 +13,15 @@
 #warning "It is supposed to be compiled using the i686 cross-compiler"
 #endif
 
-// Will be called second
-__attribute__ ((constructor)) void foo(void)
-{
-    ega_textbuffer_set_color(EGA_COLOR_LIGHT_GREY, EGA_COLOR_BLACK);
-    ega_textbuffer_write("constructor foo is running\n");
-}
+//extern uintptr_t stack_bottom_addr_symbol;
+//extern uintptr_t stack_top_addr_symbol;
 
-// Will be called first
-__attribute__ ((constructor)) void foo2(void)
-{
-    ega_textbuffer_set_color(EGA_COLOR_LIGHT_GREY, EGA_COLOR_BLACK);
-    ega_textbuffer_write("constructor foo2 is running\n");
-}
-
-// Will be called first
-__attribute__ ((destructor)) void foo3(void)
-{
-    ega_textbuffer_set_color(EGA_COLOR_LIGHT_GREY, EGA_COLOR_BLACK);
-    ega_textbuffer_write("destructor foo3 is running\n");
-}
-
-// Will be called second
-__attribute__ ((destructor)) void foo4(void)
-{
-    ega_textbuffer_set_color(EGA_COLOR_LIGHT_GREY, EGA_COLOR_BLACK);
-    ega_textbuffer_write("destructor foo4 is running\n");
-}
+//uint32_t* stack_bottom_addr = &stack_bottom_addr_symbol;
+//uint32_t* stack_top_addr = &stack_top_addr_symbol;
 
 void kmain(void)
 {
+    ega_textbuffer_clear();
     ega_textbuffer_set_color(EGA_COLOR_LIGHT_GREY, EGA_COLOR_BLACK);
     ega_textbuffer_write("Hello from Kernel!\n");
     for(uint8_t i = 1; i < 16; ++i) {

@@ -6,7 +6,10 @@
 
 #include <string.h>
 
-uint16_t* ega_textbuffer = (uint16_t*)0xB8000;
+uint16_t* ega_textbuffer = (uint16_t*)0xC03FF000;
+
+const uint8_t EGA_TEXTBUFFER_WIDTH = 80;
+const uint8_t EGA_TEXTBUFFER_HEIGHT = 25;
 
 uint8_t ega_textbuffer_xpos = 0;
 uint8_t ega_textbuffer_ypos = 0;
@@ -54,11 +57,10 @@ void ega_textbuffer_write(const char* str)
 {
     for (uint32_t i = 0; i < strlen(str); ++i) {
         if(str[i] == '\n') {
-            ega_textbuffer_xpos = 0;
-            ega_textbuffer_ypos++;
-            return;
+            ega_textbuffer_set_position(0, ega_textbuffer_ypos + 1);
+            continue;
         }
         ega_textbuffer_putch((uint8_t)str[i]);
-        ega_textbuffer_xpos++;
+        ega_textbuffer_set_position(ega_textbuffer_xpos + 1, ega_textbuffer_ypos);
     }
 }
