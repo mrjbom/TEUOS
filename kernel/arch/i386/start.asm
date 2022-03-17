@@ -124,7 +124,7 @@ section .text
     ; Unmap the identity mapping as it is now unnecessary.
     mov [boot_page_directory + 0], DWORD 0
 
-    ; Reload crc3 to force a TLB flush so the changes to take effect.
+    ; Reload cr3 to force a TLB flush so the changes to take effect.
     mov ecx, cr3
     mov cr3, ecx
 

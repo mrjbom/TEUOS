@@ -1,11 +1,5 @@
 #include "egatextmode.h"
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
-
-#include <string.h>
-
 uint16_t* ega_textbuffer = (uint16_t*)0xC03FF000;
 
 const uint8_t EGA_TEXTBUFFER_WIDTH = 80;

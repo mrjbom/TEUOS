@@ -1,3 +1,5 @@
 .vscode/
 **.o
 **.a
+iso/boot/kernel-0.bin
+initgdb

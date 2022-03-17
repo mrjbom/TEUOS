@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "arch/i386/gdt/gdt.h"
 #include "arch/i386/egatextmode/egatextmode.h"
 
 #ifdef __linux__
@@ -21,11 +22,9 @@
 
 void kmain(void)
 {
+    gdt_init();
+
     ega_textbuffer_clear();
     ega_textbuffer_set_color(EGA_COLOR_LIGHT_GREY, EGA_COLOR_BLACK);
     ega_textbuffer_write("Hello from Kernel!\n");
-    for(uint8_t i = 1; i < 16; ++i) {
-        ega_textbuffer_set_color(i, EGA_COLOR_BLACK);
-        ega_textbuffer_write("Hello from Kernel!\n");
-    }
 }

@@ -88,6 +88,12 @@ $(OBJDIR)/kmain.o: $(SRCDIR)/kmain.c $(ARCHI386DIR)/egatextmode/egatextmode.h
 $(OBJDIR)/egatextmode.o: $(ARCHI386DIR)/egatextmode/egatextmode.c $(ARCHI386DIR)/egatextmode/egatextmode.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
+$(OBJDIR)/gdt.o: $(ARCHI386DIR)/gdt/gdt.c $(ARCHI386DIR)/gdt/gdt.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+
+$(OBJDIR)/gdt_staff.o: $(ARCHI386DIR)/gdt/gdt_staff.asm
+	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
+
 $(CRTIOBJ): $(ARCHI386DIR)/crti.asm
 	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
 
