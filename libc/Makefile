@@ -28,9 +28,6 @@ $(LIBCHOSTEDOBJFILES)
 
 LIBCKOBJS = $(LIBCFREEOBJFILES:.o=.libk.o)
 
-error:
-	$(error use "make all")
-
 $(LIBCDIR)/libk.a: $(LIBCOBJDIR) $(LIBCKOBJS)
 	$(UTILSPATH)/$(LINKER) -r -o $@ $(LIBCKOBJS) $(LINKERFLAGS)
 

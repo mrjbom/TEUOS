@@ -1,4 +1,5 @@
 .PHONY: all clean showvars
+.DEFAULT_GOAL := all
 
 SRCDIR = kernel
 OBJDIR = obj

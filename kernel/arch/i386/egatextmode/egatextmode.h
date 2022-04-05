@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-enum ega_color {
+enum ega_textmode_color {
     EGA_COLOR_BLACK = 0,
     EGA_COLOR_BLUE = 1,
     EGA_COLOR_GREEN = 2,
@@ -25,25 +25,29 @@ enum ega_color {
     EGA_COLOR_WHITE = 15,
 };
 
-extern uint16_t* ega_textbuffer;
+extern uint16_t* ega_textmode_buffer_addr;
 
-extern const uint8_t EGA_TEXTBUFFER_WIDTH;
-extern const uint8_t EGA_TEXTBUFFER_HEIGHT;
+extern const uint8_t EGA_TEXTMODE_BUFFER_WIDTH;
+extern const uint8_t EGA_TEXTMODE_BUFFER_HEIGHT;
 
-//Foreground and background color
-extern uint8_t ega_textbuffer_color;
+// Text mode state
+// Next symbol position
+extern uint8_t ega_textmode_xpos;
+extern uint8_t ega_textmode_ypos;
 
-extern uint8_t ega_textbuffer_xpos;
-extern uint8_t ega_textbuffer_ypos;
+// Current symbol color(fg and bg)
+extern uint8_t ega_textmode_color;
 
-extern void ega_textbuffer_set_color(uint8_t fg, uint8_t bg);
+extern void ega_textmode_init(void);
 
-extern void ega_textbuffer_set_position(uint8_t x, uint8_t y);
+extern void ega_textmode_set_color(uint8_t fg, uint8_t bg);
 
-extern void ega_textbuffer_clear(void);
+extern void ega_textmode_set_position(uint8_t x, uint8_t y);
 
-extern void ega_textbuffer_putch(uint8_t ch);
+extern void ega_textmode_clear(void);
 
-extern void ega_textbuffer_write(const char* str);
+extern void ega_textmode_putch(uint8_t ch);
+
+extern void ega_textmode_write(const char* str);
 
 #endif

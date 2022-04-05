@@ -1,8 +1,9 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "arch/i386/gdt/gdt.h"
+#include <string.h>
 #include "arch/i386/egatextmode/egatextmode.h"
+#include "arch/i386/gdt/gdt.h"
 
 #ifdef __linux__
 #error "This is not intended to be compiled for Linux"
@@ -22,9 +23,9 @@
 
 void kmain(void)
 {
-    gdt_init();
+    ega_textmode_init();
+    ega_textmode_write("Hello from Kernel!\n\n");
 
-    ega_textbuffer_clear();
-    ega_textbuffer_set_color(EGA_COLOR_LIGHT_GREY, EGA_COLOR_BLACK);
-    ega_textbuffer_write("Hello from Kernel!\n");
+    ega_textmode_write("Setting up GDT...\n");
+    gdt_init();
 }
