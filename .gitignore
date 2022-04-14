@@ -3,3 +3,4 @@
 **.a
 iso/boot/kernel-0.bin
 initgdb
+kernel.map

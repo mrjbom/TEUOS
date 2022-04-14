@@ -4,8 +4,6 @@
 
 uint64_t gdt[GDT_SIZE];
 
-extern void gdt_flush(uint32_t);
-
 void gdt_init(void)
 {
     //Fill GDT
@@ -37,8 +35,8 @@ uint64_t gdt_create_descriptor(uint32_t base, uint32_t limit, uint16_t flag)
     descriptor <<= 32;
  
     // Create the low 32 bit segment
-    descriptor |= base  << 16;                       // set base bits 15:0
-    descriptor |= limit  & 0x0000FFFF;               // set limit bits 15:0
+    descriptor |= base  << 16;                // set base bits 15:0
+    descriptor |= limit  & 0x0000FFFF;        // set limit bits 15:0
 
     return descriptor;
 }

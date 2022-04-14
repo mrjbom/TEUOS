@@ -52,7 +52,6 @@ resb 4096
 boot_page_table1:
 resb 4096
 
-
 extern _init
 extern _fini
 extern kmain
@@ -62,6 +61,17 @@ extern _kernel_end
 section .multiboot.text progbits alloc exec nowrite align=16 ; The information about the section is the same as that of a default text
 global _start;:function (_start.end - _start)
 _start:
+    ; Calculate kernel size
+    mov edi, _kernel_end - 0xC0000000
+    sub edi, _kernel_start
+
+    ; Check whether the whole kernel will fit into one page table (3 MiB)
+    ; 768 pages - 3 MiB (1 page for VGA video mem)
+    cmp edi, 4096 * (768 - 1)
+    ; halt if the kernel is more than 3 MiB
+    jge .halt
+
+
     ; Physical address of boot_page_table1
     mov edi, (boot_page_table1 - 0xC0000000)
     ; Current page address

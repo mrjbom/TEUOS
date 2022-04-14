@@ -26,14 +26,14 @@ WARNINGS = -Werror -Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align
             -Wwrite-strings \
             -Wredundant-decls -Wnested-externs -Winline -Wno-long-long \
             -Wconversion -Wstrict-prototypes
-CFLAGS = -g3 -std=gnu99 -ffreestanding -I$(LIBCINCLUDEDIR) $(WARNINGS)
+CFLAGS = -O0 -g3 -std=gnu99 -ffreestanding -masm=intel -I$(LIBCINCLUDEDIR) $(WARNINGS)
 
 #Linker
 #Linking result
 KERNELBINFILENAME = kernel-0.bin
 LINKER = i686-elf-gcc
 LINKERSCRIPTFILE = $(ARCHI386DIR)/linker.ld
-LINKERFLAGS = -ffreestanding -nostdlib -lgcc 
+LINKERFLAGS = -ffreestanding -nostdlib -lgcc -Wl,-Map=kernel.map
 #print memory map
 #-Wl,-Map=kernel.map
 
@@ -87,6 +87,15 @@ $(OBJDIR)/kmain.o: $(SRCDIR)/kmain.c $(ARCHI386DIR)/egatextmode/egatextmode.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
 $(OBJDIR)/egatextmode.o: $(ARCHI386DIR)/egatextmode/egatextmode.c $(ARCHI386DIR)/egatextmode/egatextmode.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+
+$(OBJDIR)/mmu.o: $(ARCHI386DIR)/mmu/mmu.c $(ARCHI386DIR)/mmu/mmu.h $(ARCHI386DIR)/mmu/pde.h $(ARCHI386DIR)/mmu/pte.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+
+$(OBJDIR)/pde.o: $(ARCHI386DIR)/mmu/pde.c $(ARCHI386DIR)/mmu/pde.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+
+$(OBJDIR)/pte.o: $(ARCHI386DIR)/mmu/pte.c $(ARCHI386DIR)/mmu/pte.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
 $(OBJDIR)/gdt.o: $(ARCHI386DIR)/gdt/gdt.c $(ARCHI386DIR)/gdt/gdt.h

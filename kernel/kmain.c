@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "arch/i386/egatextmode/egatextmode.h"
+#include "arch/i386/mmu/mmu.h"
 #include "arch/i386/gdt/gdt.h"
 
 #ifdef __linux__
@@ -15,16 +16,13 @@
 #warning "It is supposed to be compiled using the i686 cross-compiler"
 #endif
 
-//extern uintptr_t stack_bottom_addr_symbol;
-//extern uintptr_t stack_top_addr_symbol;
-
-//uint32_t* stack_bottom_addr = &stack_bottom_addr_symbol;
-//uint32_t* stack_top_addr = &stack_top_addr_symbol;
-
 void kmain(void)
 {
     ega_textmode_init();
     ega_textmode_write("Hello from Kernel!\n\n");
+
+    ega_textmode_write("Setting up sections permissions...\n");
+    mmu_init_sections_permissions();
 
     ega_textmode_write("Setting up GDT...\n");
     gdt_init();

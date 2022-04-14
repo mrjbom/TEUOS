@@ -50,6 +50,9 @@ void ega_textmode_clear(void)
 void ega_textmode_putch(uint8_t ch)
 {
     uint16_t offset = (uint16_t)(ega_textmode_ypos * EGA_TEXTMODE_BUFFER_WIDTH + ega_textmode_xpos);
+    if(offset >= EGA_TEXTMODE_BUFFER_WIDTH * EGA_TEXTMODE_BUFFER_HEIGHT) {
+        return;
+    }
     ega_textmode_buffer_addr[offset] = ega_textmode_entry(ch, ega_textmode_color);
 }
 
