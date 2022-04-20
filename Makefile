@@ -92,17 +92,35 @@ $(OBJDIR)/egatextmode.o: $(ARCHI386DIR)/egatextmode/egatextmode.c $(ARCHI386DIR)
 $(OBJDIR)/mmu.o: $(ARCHI386DIR)/mmu/mmu.c $(ARCHI386DIR)/mmu/mmu.h $(ARCHI386DIR)/mmu/pde.h $(ARCHI386DIR)/mmu/pte.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
-$(OBJDIR)/pde.o: $(ARCHI386DIR)/mmu/pde.c $(ARCHI386DIR)/mmu/pde.h
+$(OBJDIR)/pde.o: $(ARCHI386DIR)/mmu/pde.c $(ARCHI386DIR)/mmu/pde.h $(LIBCINCLUDEDIR)/bits.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
-$(OBJDIR)/pte.o: $(ARCHI386DIR)/mmu/pte.c $(ARCHI386DIR)/mmu/pte.h
+$(OBJDIR)/pte.o: $(ARCHI386DIR)/mmu/pte.c $(ARCHI386DIR)/mmu/pte.h $(LIBCINCLUDEDIR)/bits.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
 $(OBJDIR)/gdt.o: $(ARCHI386DIR)/gdt/gdt.c $(ARCHI386DIR)/gdt/gdt.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
-$(OBJDIR)/gdt_staff.o: $(ARCHI386DIR)/gdt/gdt_staff.asm
+$(OBJDIR)/gdt_flush.o: $(ARCHI386DIR)/gdt/gdt_flush.asm
 	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
+
+$(OBJDIR)/interrupts.o: $(ARCHI386DIR)/interrupts/interrupts.c $(ARCHI386DIR)/interrupts/interrupts.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+
+$(OBJDIR)/exceptions.o: $(ARCHI386DIR)/interrupts/exceptions/exceptions.c $(ARCHI386DIR)/interrupts/exceptions/exceptions.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+
+$(OBJDIR)/idt.o: $(ARCHI386DIR)/interrupts/idt/idt.c $(ARCHI386DIR)/interrupts/idt/idt.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+
+$(OBJDIR)/idt_flush.o: $(ARCHI386DIR)/interrupts/idt/idt_flush.asm
+	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
+
+$(OBJDIR)/isrs.o: $(ARCHI386DIR)/interrupts/isrs.asm
+	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
+
+$(OBJDIR)/isr_handler.o: $(ARCHI386DIR)/interrupts/isr_handler.c $(ARCHI386DIR)/interrupts/isr_handler.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
 $(CRTIOBJ): $(ARCHI386DIR)/crti.asm
 	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@

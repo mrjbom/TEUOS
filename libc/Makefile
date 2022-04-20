@@ -21,7 +21,8 @@ $(LIBCOBJDIR)/strlen.o \
 $(LIBCOBJDIR)/memset.o \
 $(LIBCOBJDIR)/memcpy.o \
 $(LIBCOBJDIR)/memcmp.o \
-$(LIBCOBJDIR)/memmove.o
+$(LIBCOBJDIR)/memmove.o \
+$(LIBCOBJDIR)/mpaland-printf.o
 
 LIBCHOSTEDOBJFILES =\
 #$(LIBCOBJDIR)/malloc.o #for example
@@ -48,6 +49,9 @@ $(LIBCOBJDIR)/memcmp.libk.o: $(LIBCDIR)/string/memcmp.c $(LIBCINCLUDEDIR)/string
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(LIBCKCFLAGS)
 
 $(LIBCOBJDIR)/memmove.libk.o: $(LIBCDIR)/string/memmove.c $(LIBCINCLUDEDIR)/string.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(LIBCKCFLAGS)
+
+$(LIBCOBJDIR)/mpaland-printf.libk.o: $(LIBCDIR)/mpaland-printf/mpaland-printf.c $(LIBCDIR)/mpaland-printf/mpaland-printf.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(LIBCKCFLAGS)
 
 $(LIBCOBJDIR):

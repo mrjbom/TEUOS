@@ -2,9 +2,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 #include "arch/i386/egatextmode/egatextmode.h"
 #include "arch/i386/mmu/mmu.h"
 #include "arch/i386/gdt/gdt.h"
+#include "arch/i386/interrupts/idt/idt.h"
 
 #ifdef __linux__
 #error "This is not intended to be compiled for Linux"
@@ -19,11 +21,21 @@
 void kmain(void)
 {
     ega_textmode_init();
-    ega_textmode_write("Hello from Kernel!\n\n");
+    printf_("Hello from Kernel!\n\n");
 
-    ega_textmode_write("Setting up sections permissions...\n");
+    printf_("Setting up sections permissions...\n");
     mmu_init_sections_permissions();
 
-    ega_textmode_write("Setting up GDT...\n");
+    printf_("Setting up GDT...\n");
     gdt_init();
+    
+    printf_("Setting up IDT...\n");
+    idt_init();
+    printf_("Enabling interrupts...\n");
+    printf_("Test interrupts...\n");
+    __asm__ volatile("sti");
+    __asm__ volatile("int 0");
+    __asm__ volatile("int 1");
+    __asm__ volatile("cli");
+    while(true);
 }

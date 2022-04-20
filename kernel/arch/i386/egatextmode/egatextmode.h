@@ -63,7 +63,4 @@ extern void ega_textmode_clear(void);
 /* Put character in the text mode buffer using the current position and color */
 extern void ega_textmode_putch(uint8_t ch);
 
-/* Put string in the text mode buffer using putch func */
-extern void ega_textmode_write(const char* str);
-
 #endif

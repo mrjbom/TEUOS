@@ -86,7 +86,6 @@ _start:
     cmp esi, (_kernel_end - 0xC0000000)
     jge .make_pt_end
 
-    ; TODO
     ; Map physical address as "present, writable". Note that this maps
     ; .text and .rodata as writable. Mind security and map them as non-writable.
     mov edx, esi
