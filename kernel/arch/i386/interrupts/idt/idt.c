@@ -34,6 +34,33 @@ void idt_init(void)
     idt[19] = idt_create_descriptor((uint32_t)isr19, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
     idt[20] = idt_create_descriptor((uint32_t)isr20, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
     idt[21] = idt_create_descriptor((uint32_t)isr21, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[22] = idt_create_descriptor((uint32_t)isr22, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[23] = idt_create_descriptor((uint32_t)isr23, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[24] = idt_create_descriptor((uint32_t)isr24, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[25] = idt_create_descriptor((uint32_t)isr25, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[26] = idt_create_descriptor((uint32_t)isr26, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[27] = idt_create_descriptor((uint32_t)isr27, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[28] = idt_create_descriptor((uint32_t)isr28, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[29] = idt_create_descriptor((uint32_t)isr29, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[30] = idt_create_descriptor((uint32_t)isr30, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[31] = idt_create_descriptor((uint32_t)isr31, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+
+    idt[32] = idt_create_descriptor((uint32_t)isr32, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[33] = idt_create_descriptor((uint32_t)isr33, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[34] = idt_create_descriptor((uint32_t)isr34, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[35] = idt_create_descriptor((uint32_t)isr35, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[36] = idt_create_descriptor((uint32_t)isr36, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[37] = idt_create_descriptor((uint32_t)isr37, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[38] = idt_create_descriptor((uint32_t)isr38, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[39] = idt_create_descriptor((uint32_t)isr39, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[40] = idt_create_descriptor((uint32_t)isr40, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[41] = idt_create_descriptor((uint32_t)isr41, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[42] = idt_create_descriptor((uint32_t)isr42, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[43] = idt_create_descriptor((uint32_t)isr43, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[44] = idt_create_descriptor((uint32_t)isr44, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[45] = idt_create_descriptor((uint32_t)isr45, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[46] = idt_create_descriptor((uint32_t)isr46, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
+    idt[47] = idt_create_descriptor((uint32_t)isr47, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
 
     //Fill IDTR
     idtr_data_ptr.limit = sizeof(idt) - 1;

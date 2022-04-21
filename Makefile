@@ -122,11 +122,20 @@ $(OBJDIR)/isrs.o: $(ARCHI386DIR)/interrupts/isrs.asm
 $(OBJDIR)/isr_handler.o: $(ARCHI386DIR)/interrupts/isr_handler.c $(ARCHI386DIR)/interrupts/isr_handler.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
+$(OBJDIR)/pic.o: $(ARCHI386DIR)/interrupts/pic.c $(ARCHI386DIR)/interrupts/pic.h $(ARCHI386DIR)/inlineassembly/inlineassembly.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+
+$(OBJDIR)/inlineassembly.o: $(ARCHI386DIR)/inlineassembly/inlineassembly.c $(ARCHI386DIR)/inlineassembly/inlineassembly.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+
 $(CRTIOBJ): $(ARCHI386DIR)/crti.asm
 	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
 
 $(CRTNOBJ): $(ARCHI386DIR)/crtn.asm
 	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
+
+$(OBJDIR)/test.o: kernel/test.c kernel/test.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
 clean: libcclean
 	rm -r -f $(OBJDIR)

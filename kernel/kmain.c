@@ -7,6 +7,8 @@
 #include "arch/i386/mmu/mmu.h"
 #include "arch/i386/gdt/gdt.h"
 #include "arch/i386/interrupts/idt/idt.h"
+#include "arch/i386/interrupts/pic.h"
+#include "arch/i386/inlineassembly/inlineassembly.h"
 
 #ifdef __linux__
 #error "This is not intended to be compiled for Linux"
@@ -31,11 +33,8 @@ void kmain(void)
     
     printf_("Setting up IDT...\n");
     idt_init();
-    printf_("Enabling interrupts...\n");
-    printf_("Test interrupts...\n");
+    pic_init();
+    printf_("Enabling interrupts...");
     __asm__ volatile("sti");
-    __asm__ volatile("int 0");
-    __asm__ volatile("int 1");
-    __asm__ volatile("cli");
     while(true);
 }
