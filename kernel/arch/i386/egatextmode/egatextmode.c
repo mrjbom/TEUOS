@@ -51,14 +51,47 @@ void ega_textmode_clear(void)
 
 void ega_textmode_putch(uint8_t ch)
 {
-    uint16_t offset = (uint16_t)(ega_textmode_ypos * EGA_TEXTMODE_BUFFER_WIDTH + ega_textmode_xpos);
-    if(offset >= EGA_TEXTMODE_BUFFER_WIDTH * EGA_TEXTMODE_BUFFER_HEIGHT) {
+    if (ega_textmode_xpos >= EGA_TEXTMODE_BUFFER_WIDTH || ega_textmode_ypos >= EGA_TEXTMODE_BUFFER_HEIGHT) {
         return;
     }
     if(ch == '\n') {
-        ega_textmode_set_position(0, ega_textmode_ypos + 1);
+        if(ega_textmode_ypos + 1 == EGA_TEXTMODE_BUFFER_HEIGHT) {
+            ega_textmode_scroll();
+            ega_textmode_set_position(0, ega_textmode_ypos);
+        }
+        else {
+            ega_textmode_set_position(0, ega_textmode_ypos + 1);
+        }
         return;
     }
-    ega_textmode_buffer_addr[offset] = ega_textmode_entry(ch, ega_textmode_color);
-    ega_textmode_set_position(ega_textmode_xpos + 1, ega_textmode_ypos);
+    uint16_t offset = (uint16_t)(ega_textmode_ypos * EGA_TEXTMODE_BUFFER_WIDTH + ega_textmode_xpos);
+    // Check textmode buffer overflow
+    if(offset < EGA_TEXTMODE_BUFFER_WIDTH * EGA_TEXTMODE_BUFFER_HEIGHT) {
+        ega_textmode_buffer_addr[offset] = ega_textmode_entry(ch, ega_textmode_color);
+        ega_textmode_set_position(ega_textmode_xpos + 1, ega_textmode_ypos);
+    }
+}
+
+void ega_textmode_scroll()
+{
+    /*
+     * Copy line by line
+     * 
+     * 1 -> 0
+     * 2 -> 1
+     * 3 -> 2
+     * 4 -> 3
+     * ...
+     */
+    for(uint8_t y = 1; y < EGA_TEXTMODE_BUFFER_HEIGHT; ++y) {
+        memcpy(
+            (ega_textmode_buffer_addr + ((y - 1) * EGA_TEXTMODE_BUFFER_WIDTH)),
+            (ega_textmode_buffer_addr + ((y) * EGA_TEXTMODE_BUFFER_WIDTH)),
+            EGA_TEXTMODE_BUFFER_WIDTH
+        );
+    }
+    // Clear bottom line
+    for(uint8_t x = 0; x < EGA_TEXTMODE_BUFFER_WIDTH; ++x) {
+        ega_textmode_buffer_addr[(EGA_TEXTMODE_BUFFER_HEIGHT - 1) * EGA_TEXTMODE_BUFFER_WIDTH + x] = ega_textmode_entry(' ', ega_textmode_color);
+    }
 }

@@ -32,6 +32,6 @@ extern bool are_interrupts_enabled(void);
  */
 extern uint32_t save_irqdisable(void);
 
-extern void irqrestore(unsigned long flags);
+extern void irqrestore(uint32_t flags);
 
 #endif

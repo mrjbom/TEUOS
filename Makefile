@@ -128,14 +128,14 @@ $(OBJDIR)/pic.o: $(ARCHI386DIR)/interrupts/pic.c $(ARCHI386DIR)/interrupts/pic.h
 $(OBJDIR)/inlineassembly.o: $(ARCHI386DIR)/inlineassembly/inlineassembly.c $(ARCHI386DIR)/inlineassembly/inlineassembly.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
+$(OBJDIR)/pit.o: $(ARCHI386DIR)/pit/pit.c $(ARCHI386DIR)/pit/pit.h $(ARCHI386DIR)/inlineassembly/inlineassembly.h
+	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+
 $(CRTIOBJ): $(ARCHI386DIR)/crti.asm
 	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
 
 $(CRTNOBJ): $(ARCHI386DIR)/crtn.asm
 	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
-
-$(OBJDIR)/test.o: kernel/test.c kernel/test.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
 clean: libcclean
 	rm -r -f $(OBJDIR)
@@ -150,6 +150,7 @@ showvars:
 	@echo $(COBJFILES)
 
 QEMUFLAGS = -d int -no-reboot -m 128M -s -S -monitor stdio
+#QEMUFLAGS = -no-reboot -m 32M -s -S -monitor stdio
 
 runqemu:
 	qemu-system-i386 $(QEMUFLAGS) $(BOOTABLEISOFILENAME)

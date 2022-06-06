@@ -2,12 +2,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdio.h>
+#include "stdio.h"
 #include "arch/i386/egatextmode/egatextmode.h"
 #include "arch/i386/mmu/mmu.h"
 #include "arch/i386/gdt/gdt.h"
 #include "arch/i386/interrupts/idt/idt.h"
 #include "arch/i386/interrupts/pic.h"
+#include "arch/i386/pit/pit.h"
 #include "arch/i386/inlineassembly/inlineassembly.h"
 
 #ifdef __linux__
@@ -33,8 +34,14 @@ void kmain(void)
     
     printf_("Setting up IDT...\n");
     idt_init();
+
+    printf_("Setting up PIC...\n");
     pic_init();
-    printf_("Enabling interrupts...");
+
+    printf_("Setting up PIT...\n");
+    pit_init();
+
+    printf_("Enabling interrupts...\n");
     __asm__ volatile("sti");
     while(true);
 }

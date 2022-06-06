@@ -40,7 +40,7 @@ inline uint32_t save_irqdisable(void)
     return flags;
 }
 
-inline void irqrestore(unsigned long flags)
+inline void irqrestore(uint32_t flags)
 {
     asm ("push %0\n\tpopf" : : "rm"(flags) : "memory","cc");
 }

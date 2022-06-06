@@ -66,7 +66,7 @@ void idt_init(void)
     idtr_data_ptr.limit = sizeof(idt) - 1;
     idtr_data_ptr.base = (uint32_t)&idt;
 
-    //Load IDT
+    //Load IDTR
     idt_flush((uint32_t)&idtr_data_ptr);
 }
 
@@ -74,14 +74,11 @@ idt_entry_t idt_create_descriptor(uint32_t offset, uint16_t selector, uint8_t fl
 {
     idt_entry_t descriptor;
 
-    descriptor.offset_low       =   (uint16_t)(offset & 0x0000FFFF);
-    descriptor.offset_high      =   (uint16_t)((offset & 0xFFFF0000) >> 16);
-
-    descriptor.segment_selector =   selector;
-
-    descriptor.allways0         =   0;
-
-    descriptor.flags            =   flags;
+    descriptor.offset_low       = (uint16_t)(offset & 0x0000FFFF);
+    descriptor.offset_high      = (uint16_t)((offset & 0xFFFF0000) >> 16);
+    descriptor.segment_selector = selector;
+    descriptor.allways0         = 0;
+    descriptor.flags            = flags;
 
     return descriptor;
 }

@@ -14,7 +14,7 @@ void gdt_init(void)
 
     //Fill GDT
     gdt[0] = gdt_create_descriptor(0, 0, 0, 0);
-    // Kernel code segment
+    // Kernel code segment (0x08)
     gdt[1] = gdt_create_descriptor(
         0,
         0x000FFFFF,
@@ -23,7 +23,7 @@ void gdt_init(void)
         SEG_ACCESS_ACCESSED(0),
         SEG_FLAGS_GRAN(1) | SEG_FLAGS_DB(1) | SEG_FLAGS_L(0)
     );
-    // Kernel data segment
+    // Kernel data segment (0x10)
     gdt[2] = gdt_create_descriptor(
         0,
         0x000FFFFF,
@@ -32,7 +32,7 @@ void gdt_init(void)
         SEG_ACCESS_ACCESSED(0),
         SEG_FLAGS_GRAN(1) | SEG_FLAGS_DB(1) | SEG_FLAGS_L(0)
     );
-    // User code segment
+    // User code segment (0x18)
     gdt[3] = gdt_create_descriptor(
         0,
         0x000FFFFF,
@@ -41,7 +41,7 @@ void gdt_init(void)
         SEG_ACCESS_ACCESSED(0),
         SEG_FLAGS_GRAN(1) | SEG_FLAGS_DB(1) | SEG_FLAGS_L(0)
     );
-    // User data segment
+    // User data segment (0x20)
     gdt[4] = gdt_create_descriptor(
         0,
         0x000FFFFF,
