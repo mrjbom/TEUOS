@@ -141,7 +141,17 @@ section .text
     ; The stack must be setting up before calling C functions.
     mov esp, bootstrap_stack_top
 
+    ; Save EAX and EBX
+    push eax
+    push ebx
     call _init
+    ; Restore EAX and EBX
+    pop ebx
+    pop eax
+    
+    ; Push EBX(physical address of the MBI) and EAX(Magic Number)
+    push ebx
+    push eax
     call kmain
     call _fini
 

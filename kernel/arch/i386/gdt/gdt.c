@@ -9,10 +9,10 @@ gdtr_data gdtr_data_ptr;
 
 void gdt_init(void)
 {
-    //Clear GDT
+    // Clear GDT
     memset(&gdt, 0, sizeof(gdt_entry_t) * GDT_SIZE);
 
-    //Fill GDT
+    // Fill GDT
     gdt[0] = gdt_create_descriptor(0, 0, 0, 0);
     // Kernel code segment (0x08)
     gdt[1] = gdt_create_descriptor(
@@ -51,11 +51,11 @@ void gdt_init(void)
         SEG_FLAGS_GRAN(1) | SEG_FLAGS_DB(1) | SEG_FLAGS_L(0)
     );
 
-    //Fill GDTR
+    // Fill GDTR
     gdtr_data_ptr.limit = sizeof(gdt) - 1;
     gdtr_data_ptr.base = (uint32_t)&gdt;
 
-    //Load GDT and reload segment registers
+    // Load GDTR
     gdt_flush((uint32_t)&gdtr_data_ptr);
 }
 

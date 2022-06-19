@@ -50,22 +50,30 @@
 #define PIT_OCW_COUNTER_1           0x40    //01000000
 #define PIT_OCW_COUNTER_2           0x80    //10000000
 
+/* Init and setting up PIT */
 extern void pit_init(void);
 
-// required_freq - the frequency at which PIT will try to work (18 - 1193181)
-// counter - PIT_OCW_COUNTER_x
+/*
+ * Setting up PIT
+ * required_freq - the frequency at which PIT will try to work (18 - 1193181)
+ * counter - PIT_OCW_COUNTER_x
+ */
 void pit_start_counter(uint32_t required_freq, uint8_t counter, uint8_t mode);
 
-// send OCW(Operation Command Word)
+/* Send command to PIT */
 extern void pit_send_command(uint8_t cmd);
 
-// counter - (0-2)
+/* 
+ * Send data to PIT
+ * counter - (0-2)
+ */
 extern void pit_send_data(uint8_t counter, uint8_t data);
 
-// counter - (0-2)
+/* 
+ * Return data from PIT
+ * counter - (0-2)
+ */
 extern uint8_t pit_read_data(uint16_t counter);
-
-extern uint32_t pit_get_ticks(void);
 
 extern void clock_test(void);
 

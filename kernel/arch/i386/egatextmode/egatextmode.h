@@ -57,12 +57,19 @@ extern void ega_textmode_set_color(uint8_t fg, uint8_t bg);
 /* Change next symbol position */
 extern void ega_textmode_set_position(uint8_t x, uint8_t y);
 
+/* Get x position of next symbol position */
+extern uint8_t ega_textmode_get_x_position(void);
+
+/* Get y position of next symbol position */
+extern uint8_t ega_textmode_get_y_position(void);
+
 /* Clears the text mode buffer by filling it with zeros */
 extern void ega_textmode_clear(void);
 
 /* Put character in the text mode buffer using the current position and color */
 extern void ega_textmode_putch(uint8_t ch);
 
+/* Scrolling line-by-line from bottom to top*/
 extern void ega_textmode_scroll(void);
 
 #endif

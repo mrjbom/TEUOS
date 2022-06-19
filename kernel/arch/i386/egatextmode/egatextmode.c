@@ -42,6 +42,16 @@ void ega_textmode_set_position(uint8_t x, uint8_t y)
     ega_textmode_ypos = y;
 }
 
+uint8_t ega_textmode_get_x_position(void)
+{
+    return ega_textmode_xpos;
+}
+
+uint8_t ega_textmode_get_y_position(void)
+{
+    return ega_textmode_ypos;
+}
+
 void ega_textmode_clear(void)
 {
     for(uint16_t i = 0; i < EGA_TEXTMODE_BUFFER_WIDTH * EGA_TEXTMODE_BUFFER_HEIGHT; ++i) {
@@ -72,8 +82,11 @@ void ega_textmode_putch(uint8_t ch)
     }
 }
 
+#include "../inlineassembly/inlineassembly.h"
+
 void ega_textmode_scroll()
 {
+    uint32_t flags = save_irqdisable();
     /*
      * Copy line by line
      * 
@@ -87,11 +100,13 @@ void ega_textmode_scroll()
         memcpy(
             (ega_textmode_buffer_addr + ((y - 1) * EGA_TEXTMODE_BUFFER_WIDTH)),
             (ega_textmode_buffer_addr + ((y) * EGA_TEXTMODE_BUFFER_WIDTH)),
-            EGA_TEXTMODE_BUFFER_WIDTH
+            EGA_TEXTMODE_BUFFER_WIDTH * 2
         );
     }
     // Clear bottom line
     for(uint8_t x = 0; x < EGA_TEXTMODE_BUFFER_WIDTH; ++x) {
         ega_textmode_buffer_addr[(EGA_TEXTMODE_BUFFER_HEIGHT - 1) * EGA_TEXTMODE_BUFFER_WIDTH + x] = ega_textmode_entry(' ', ega_textmode_color);
     }
+
+    irqrestore(flags);
 }

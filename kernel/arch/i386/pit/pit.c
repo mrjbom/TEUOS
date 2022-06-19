@@ -1,8 +1,5 @@
 #include "pit.h"
 #include "../inlineassembly/inlineassembly.h"
-
-
-
 #include "stdio.h"
 #include "../egatextmode/egatextmode.h"
 
@@ -25,7 +22,7 @@
 #define PIT_DIVISOR_MIN         1
 #define PIT_DIVISOR_MAX         65535
  
-// Global Tick count
+// Global tick count
 uint32_t pit_ticks = 0;
 
 void pit_init()
@@ -80,14 +77,6 @@ uint8_t pit_read_data(uint16_t counter)
     return inb(port);
 }
 
-uint32_t pit_get_ticks()
-{
-    uint32_t flags = save_irqdisable();
-    uint32_t ticks = pit_ticks;
-    irqrestore(flags);
-    return ticks;
-}
-
 uint8_t hour = 0;
 uint8_t min = 0;
 uint8_t sec = 0;
@@ -112,6 +101,7 @@ void clock_test()
         min = 0;
         hour++;
     }
-    //ega_textmode_set_position(0, 8);
-    printf_("Time: %hhu hours %hhu minuts %hhu seconds\n", hour, min, sec);
+    
+    //ega_textmode_set_position(0, 1);
+    //printf_("Time: %hhu hours %hhu minuts %hhu seconds", hour, min, sec);
 }

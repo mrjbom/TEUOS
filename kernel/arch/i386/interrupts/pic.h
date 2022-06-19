@@ -26,14 +26,22 @@
 
 #define PIC_EOI         0x20        // End-of-interrupt command code
 
+/* Init PIC (remap) */
 extern void pic_init(void);
 
-// offset1 - vector offset for master PIC
-//           vectors on the master become offset1..offset1+7
-// offset2 - same for slave PIC: offset2..offset2+7
+/*
+ * Remap PIC
+ *
+ * offset1 - vector offset for master PIC
+ *           vectors on the master become offset1..offset1+7
+ * offset2 - same for slave PIC: offset2..offset2+7
+ */
 extern void pic_remap(uint8_t offset1, uint8_t offfset2);
 
-// irq_num - IRQ number(0-15)
+/* 
+ * Sends the EOI signal to the PIC depending on the IRQ number
+ * irq_num - IRQ number(0-15)
+ */
 extern void pic_send_EOI(uint8_t irq_num);
 
 #endif

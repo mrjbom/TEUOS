@@ -36,10 +36,13 @@ typedef struct
     uint32_t base;
 } __attribute__((packed)) gdtr_data;
 
+/* Load GDTR */
 extern void gdt_flush(uint32_t);
 
+/* Create GDT and fill GDT and load GDT */
 extern void gdt_init(void);
 
+/* Create GDT descriptor */
 extern gdt_entry_t gdt_create_descriptor(uint32_t base, uint32_t limit, uint8_t access, uint8_t flags);
 
 #endif

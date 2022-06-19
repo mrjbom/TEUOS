@@ -26,7 +26,7 @@ WARNINGS = -Werror -Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align
             -Wwrite-strings \
             -Wredundant-decls -Wnested-externs -Winline -Wno-long-long \
             -Wconversion -Wstrict-prototypes
-CFLAGS = -O0 -g3 -std=gnu99 -ffreestanding -masm=intel -I$(LIBCINCLUDEDIR) $(WARNINGS)
+CFLAGS = -O0 -g3 -std=gnu11 -ffreestanding -masm=intel -I$(LIBCINCLUDEDIR) $(WARNINGS)
 
 #Linker
 #Linking result
@@ -89,13 +89,16 @@ $(OBJDIR)/kmain.o: $(SRCDIR)/kmain.c $(ARCHI386DIR)/egatextmode/egatextmode.h
 $(OBJDIR)/egatextmode.o: $(ARCHI386DIR)/egatextmode/egatextmode.c $(ARCHI386DIR)/egatextmode/egatextmode.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
-$(OBJDIR)/mmu.o: $(ARCHI386DIR)/mmu/mmu.c $(ARCHI386DIR)/mmu/mmu.h $(ARCHI386DIR)/mmu/pde.h $(ARCHI386DIR)/mmu/pte.h
+$(OBJDIR)/other.o: $(ARCHI386DIR)/other/other.c $(ARCHI386DIR)/other/other.h $(ARCHI386DIR)/vmm/pde.h $(ARCHI386DIR)/vmm/pte.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
-$(OBJDIR)/pde.o: $(ARCHI386DIR)/mmu/pde.c $(ARCHI386DIR)/mmu/pde.h $(LIBCINCLUDEDIR)/bits.h
+$(OBJDIR)/tlb_flush.o: $(ARCHI386DIR)/vmm/tlb_flush.asm
+	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
+
+$(OBJDIR)/pde.o: $(ARCHI386DIR)/vmm/pde.c $(ARCHI386DIR)/vmm/pde.h $(LIBCINCLUDEDIR)/bits.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
-$(OBJDIR)/pte.o: $(ARCHI386DIR)/mmu/pte.c $(ARCHI386DIR)/mmu/pte.h $(LIBCINCLUDEDIR)/bits.h
+$(OBJDIR)/pte.o: $(ARCHI386DIR)/vmm/pte.c $(ARCHI386DIR)/vmm/pte.h $(LIBCINCLUDEDIR)/bits.h
 	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
 
 $(OBJDIR)/gdt.o: $(ARCHI386DIR)/gdt/gdt.c $(ARCHI386DIR)/gdt/gdt.h

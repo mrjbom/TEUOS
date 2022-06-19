@@ -3,9 +3,6 @@
 #include "interrupts.h"
 #include "stdio.h"
 #include "pic.h"
-
-
-
 #include "../pit/pit.h"
 
 void isr_handler(registers_t regs)

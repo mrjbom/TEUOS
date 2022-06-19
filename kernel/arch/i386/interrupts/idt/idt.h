@@ -24,13 +24,16 @@ typedef struct
     uint32_t base;
 } __attribute__((packed)) idtr_data;
 
+/* Load IDTR */
 extern void idt_flush(uint32_t);
 
+/* Create IDT and fill IDT and load IDT */
 extern void idt_init(void);
 
+/* Create IDT descriptor */
 extern idt_entry_t idt_create_descriptor(uint32_t offset, uint16_t selector, uint8_t flags);
 
-// isr's entry points
+// ISR's for IA-32 processor exceptions
 extern void isr0(void);
 extern void isr1(void);
 extern void isr2(void);
@@ -64,6 +67,7 @@ extern void isr29(void);
 extern void isr30(void);
 extern void isr31(void);
 
+// ISR's for PIC IRQ's
 extern void isr32(void);
 extern void isr33(void);
 extern void isr34(void);

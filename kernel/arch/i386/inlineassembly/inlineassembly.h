@@ -5,10 +5,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-// Sends a 8/16/32-bit value on a I/O location. Traditional names are outb, outw and outl respectively.
+/* Sends a 8/16/32-bit value on a I/O location. Traditional names are outb, outw and outl respectively */
 extern void outb(uint16_t port, uint8_t val);
 
-// Receives a 8/16/32-bit value from an I/O location. Traditional names are inb, inw and inl respectively.
+/* Receives a 8/16/32-bit value from an I/O location. Traditional names are inb, inw and inl respectively */
 extern uint8_t inb(uint16_t port);
 
 /*
@@ -19,7 +19,7 @@ extern uint8_t inb(uint16_t port);
  */
 extern void io_wait(void);
 
-// Returns a true boolean value if irq are enabled for the CPU.
+/* Returns a true boolean value if irq are enabled for the CPU */
 extern bool are_interrupts_enabled(void);
 
 /*

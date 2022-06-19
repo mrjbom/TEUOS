@@ -1,9 +1,9 @@
 #include "string.h"
 
-void* memmove(void* destptr, const void* srcptr, size_t num)
+void* memmove(void* dest, const void* src, size_t num)
 {
-    char *d = destptr;
-    const char *s = srcptr;
+    char *d = dest;
+    const char *s = src;
     if (d < s) {
         while (num--) {
             *d++ = *s++;
@@ -16,5 +16,5 @@ void* memmove(void* destptr, const void* srcptr, size_t num)
             *lastd-- = *lasts--;
         }
     }
-    return destptr;
+    return dest;
 }

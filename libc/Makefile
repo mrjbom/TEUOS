@@ -66,3 +66,4 @@ libcshowvars:
 	@echo $(LIBCSRCFILESNAMES)
 	@echo '"$(LIBCCOBJS)"'
 	@echo '"$(LIBCKOBJS)"'
+	@echo '"$(CFLAGS)"'

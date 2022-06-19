@@ -11,6 +11,6 @@ void* memcpy(void* dest, const void* src, size_t num);
 
 int memcmp(const void* memptr1, const void* memptr2, size_t num);
 
-void* memmove(void* destptr, const void* srcptr, size_t num);
+void* memmove(void* dest, const void* src, size_t num);
 
 #endif
