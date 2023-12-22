@@ -147,9 +147,6 @@ QEMUFLAGS = -no-reboot -m 32M -s -S -monitor stdio
 runqemu:
 	$(QEMU) $(QEMUFLAGS) $(BOOTABLE_ISO_NAME)
 
-runqemu:
-
-
 clean:
 	rm -f $(KERNEL_BIN_NAME)
 	rm -f $(BOOTABLE_ISO_NAME)
