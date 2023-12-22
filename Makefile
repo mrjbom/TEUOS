@@ -1,159 +1,164 @@
 .PHONY: all clean showvars
-.DEFAULT_GOAL := all
 
-SRCDIR = kernel
-OBJDIR = obj
-ARCHI386DIR = kernel/arch/i386
+BUILD_DIR = ./build
+OBJS_DIR = $(BUILD_DIR)/objs
+SRCS_DIR = .
 
-#Assebly
-ASMSRCFILES = $(shell find $(SRCDIR) -type f -name "*.asm")
-ASMSRCFILESNAMES = $(shell find $(SRCDIR) -type f -name "*.asm" -printf "%f\n")
-ASMOBJFILESNAMES = $(patsubst %.asm,%.o,$(ASMSRCFILESNAMES))
-ASMOBJFILES = $(patsubst %.asm,$(OBJDIR)/%.o,$(ASMSRCFILESNAMES))
-ASSEMBLER = nasm
-ASSEMBLERFLAGS = -g -f elf32
+BOOTABLE_ISO_NAME = bootablekernel.iso
+BOOTABLE_ISO_FILE = $(BUILD_DIR)/$(BOOTABLE_ISO_NAME)
 
-#C
-CSRCFILES = $(shell find $(SRCDIR) -type f -name "*.c")
-CSRCFILESNAMES = $(shell find $(SRCDIR) -type f -name "*.c" -printf "%f\n")
-COBJFILESNAMES = $(patsubst %.c,%.o,$(CSRCFILESNAMES))
-COBJFILES = $(patsubst %.c,$(OBJDIR)/%.o,$(CSRCFILESNAMES))
-
-#Binutils and cross-compiler
-UTILSPATH = ~/opt/cross-compilers/bare-bones-default/bin
-CC = i686-elf-gcc
-WARNINGS = -Werror -Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align \
+# C compiler settings
+GCC = i686-elf-gcc
+GCC_WARNINGS = -Werror -Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align \
             -Wwrite-strings \
             -Wredundant-decls -Wnested-externs -Winline -Wno-long-long \
             -Wconversion -Wstrict-prototypes
-CFLAGS = -O0 -g3 -std=gnu11 -ffreestanding -masm=intel -I$(LIBCINCLUDEDIR) $(WARNINGS)
+LIBC_INCLUDE = $(SRCS_DIR)/libc/include
+GCC_FLAGS = -O0 -g3 -std=gnu11 -ffreestanding -masm=intel -I$(LIBC_INCLUDE) $(GCC_WARNINGS)
 
-#Linker
-#Linking result
-KERNELBINFILENAME = kernel-0.bin
+# Assembler settings
+NASM = nasm
+NASM_FLAGS = -g -f elf32
+
+# Linker settings
+KERNEL_BIN_NAME = kernel-0.bin
+KERNEL_BIN_FILE = $(BUILD_DIR)/$(KERNEL_BIN_NAME)
 LINKER = i686-elf-gcc
-LINKERSCRIPTFILE = $(ARCHI386DIR)/linker.ld
-LINKERFLAGS = -ffreestanding -nostdlib -lgcc -Wl,-Map=kernel.map
+LINKER_SCRIPT_FILE = $(SRCS_DIR)/kernel/arch/i386/linker.ld
+LINKER_FLAGS = -ffreestanding -nostdlib -lgcc -Wl,-Map=$(SRCS_DIR)/kernel.map
 #print memory map
 #-Wl,-Map=kernel.map
 
-CRTIOBJ = $(OBJDIR)/crti.o
-CRTBEGINOBJ = $(shell $(UTILSPATH)/$(CC) $(CFLAGS) -print-file-name=crtbegin.o)
-CRTENDOBJ = $(shell $(UTILSPATH)/$(CC) $(CFLAGS) -print-file-name=crtend.o)
-CRTNOBJ = $(OBJDIR)/crtn.o
-CRTOBJFILES = $(CRTIOBJ) $(CRTBEGINOBJ) $(CRTENDOBJ) $(CRTNOBJ)
+# GRUB
+# must contain boot/grub/grub.cfg
+ISO_DIR = $(SRCS_DIR)/iso
 
-ASMOBJLINKFILES = $(filter-out $(CRTOBJFILES),$(ASMOBJFILES))
+# C sources
+SRCS_C_FILES = $(shell find $(SRCS_DIR) -name '*.c' -or -name '*.cpp')
+# just the names of .c files, without paths
+# ./kernel/arch/i386/gdt/gdt.c -> gdt.c
+#SRCS_C_FILES_NAMES = $(notdir $(SRCS_C_FILES))
+SRCS_H_FILES = $(shell find $(SRCS_DIR) -name '*.h')
 
-#GRUB
-BOOTABLEISOFILENAME = bootablekernel.iso
-#must contain boot/grub/grub.cfg
-ISODIR = iso
+# C objects
+# just the names of .o files, without paths
+# ./kernel/arch/i386/gdt/gdt.c -> gdt.o
+#OBJS_C_FILES_NAMES = $(patsubst %.c, %.o, $(SRCS_C_FILES_NAMES))
+# gdt.o -> $(OBJS_DIR)/gdt.o
+#OBJS_C_FILES = $(addprefix $(OBJS_DIR)/, $(OBJS_C_FILES_NAMES))
 
-include libc/Makefile
+# ./kernel/arch/i386/gdt/gdt.c -> ./kernel/arch/i386/gdt/gdt.o
+OBJS_C_FILES = $(patsubst %.c, %.o, $(SRCS_C_FILES))
+# ./kernel/arch/i386/gdt/gdt.o -> kernel/arch/i386/gdt/gdt.o
+OBJS_C_FILES := $(patsubst ./%, %, $(OBJS_C_FILES))
+# kernel/arch/i386/gdt/gdt.o -> $(OBJS_DIR)/kernel/arch/i386/gdt/gdt.o
+OBJS_C_FILES := $(addprefix $(OBJS_DIR)/, $(OBJS_C_FILES))
 
-all: $(LIBCTARGETS) $(BOOTABLEISOFILENAME)
+# ./kernel/arch/i386/gdt/gdt.c -> ./build/objs/./kernel/arch/i386/gdt/gdt.o
+#OBJS_C_FILES = $(addprefix $(OBJS_DIR)/, $(patsubst %.c, %.o, $(SRCS_C_FILES)))
+# We need to create folders for objects before we can start compiling objects
+# ./build/objs/./kernel/arch/i386/gdt/gdt.o -> ./build/objs/./kernel/arch/i386/gdt/
+#OBJS_C_FILES_DIRS = $(dir $(OBJS_C_FILES))
 
-$(BOOTABLEISOFILENAME): $(ISODIR)/boot/grub/grub.cfg $(KERNELBINFILENAME)
-	cp $(KERNELBINFILENAME) $(ISODIR)/boot/$(KERNELBINFILENAME)
-	grub-mkrescue -o $(BOOTABLEISOFILENAME) $(ISODIR)
+# Assembly sources
+SRCS_ASM_FILES = $(shell find $(SRCS_DIR) -name '*.asm')
+# ./kernel/arch/i386/start.asm -> start.asm
+#SRCS_ASM_FILES_NAMES = $(notdir $(SRCS_ASM_FILES))
 
-$(ISODIR)/boot/grub/grub.cfg:
-	mkdir -p $(ISODIR)/boot/grub
-	touch $(ISODIR)/boot/grub/grub.cfg
+# Assembly objects
+# start.asm -> start.o
+# OBJS_ASM_FILES_NAMES = $(patsubst %.asm, %.o, $(SRCS_ASM_FILES_NAMES))
+#OBJS_ASM_FILES_NAMES_WITHOUT_CRT_OBJS_FOR_LINKER = $(filter-out $(CRTI_O) $(CRTN_O),$(OBJS_ASM_FILES_NAMES))
+# start.o -> $(OBJS_DIR)/start.o
+#OBJS_ASM_FILES = $(addprefix $(OBJS_DIR)/, $(OBJS_ASM_FILES_NAMES))
+#OBJS_ASM_FILES_WITHOUT_CRT_OBJS_FOR_LINKER = $(addprefix $(OBJS_DIR)/, $(OBJS_ASM_FILES_NAMES_WITHOUT_CRT_OBJS_FOR_LINKER))
 
-$(KERNELBINFILENAME): $(OBJDIR) $(LINKERSCRIPTFILE) $(ASMOBJFILES) $(COBJFILES) $(LIBCKTARGET)
-	$(UTILSPATH)/$(LINKER) -T $(LINKERSCRIPTFILE) -o $(KERNELBINFILENAME) \
-	$(CRTIOBJ) $(CRTBEGINOBJ) \
-	$(ASMOBJLINKFILES) \
-	$(COBJFILES) \
-	$(LIBCKTARGET) \
-	$(CRTENDOBJ) $(CRTNOBJ) \
-	$(LINKERFLAGS)
-	@if ! grub-file --is-x86-multiboot $(KERNELBINFILENAME); then \
-        echo $(KERNELBINFILENAME) is not a multiboot! ; \
-		echo Remove $(KERNELBINFILENAME) ; \
-		rm $(KERNELBINFILENAME) ; \
+# ./kernel/arch/i386/interrupts/isrs.asm -> ./kernel/arch/i386/interrupts/isrs.o
+OBJS_ASM_FILES := $(patsubst %.asm, %.o, $(SRCS_ASM_FILES))
+# ./kernel/arch/i386/interrupts/isrs.o -> kernel/arch/i386/interrupts/isrs.o
+OBJS_ASM_FILES := $(patsubst ./%, %, $(OBJS_ASM_FILES))
+# kernel/arch/i386/interrupts/isrs.o -> $(OBJS_DIR)/kernel/arch/i386/interrupts/isrs.o
+OBJS_ASM_FILES := $(addprefix $(OBJS_DIR)/, $(OBJS_ASM_FILES))
+
+# We need to remove crti.o and crtn.o from asm object list, because they must be passed in the correct order during linking
+CRTI_O_NAME = crti.o
+CRTN_O_NAME = crtn.o
+CRTI_O_FILE = $(filter %/$(CRTI_O_NAME), $(OBJS_ASM_FILES))
+CRTN_O_FILE = $(filter %/$(CRTN_O_NAME), $(OBJS_ASM_FILES))
+CRTBEGIN_O_FILE = $(shell $(GCC) $(GCC_FLAGS) -print-file-name=crtbegin.o)
+CRTEND_O_FILE = $(shell $(GCC) $(GCC_FLAGS) -print-file-name=crtend.o)
+CRT_FILES = $(CRTI_O_FILE) $(CRTBEGIN_O_FILE) $(CRTEND_O_FILE) $(CRTN_O_FILE)
+OBJS_ASM_FILES_WITHOUT_CRTIN_OBJS_FOR_LINKER = $(filter-out %/$(CRTI_O_NAME) %/$(CRTN_O_NAME), $(OBJS_ASM_FILES))
+
+# Creates the necessary folder for the file, if it does not already exist
+objs_dir_guard=$(shell [ ! -d $(@D) ] && mkdir -p $(@D))
+
+all: $(BOOTABLE_ISO_FILE)
+	@cp $(KERNEL_BIN_FILE) $(SRCS_DIR)
+	@cp $(BOOTABLE_ISO_FILE) $(SRCS_DIR)
+
+$(BOOTABLE_ISO_FILE): $(ISO_DIR)/boot/grub/grub.cfg $(KERNEL_BIN_FILE) 
+	@echo [BUILDING iso] $@
+	@rm -f $@
+	@cp $(KERNEL_BIN_FILE) $(ISO_DIR)/boot/$(KERNEL_BIN_NAME)
+	@grub-mkrescue -o $(BOOTABLE_ISO_FILE) $(ISO_DIR)
+
+$(ISO_DIR)/boot/grub/grub.cfg:
+	@echo "[ERROR cfg]: $@ NOT EXIST!"
+
+$(KERNEL_BIN_FILE): $(LINKER_SCRIPT_FILE) $(OBJS_C_FILES) $(OBJS_ASM_FILES) $(CRT_FILES)
+	@echo "[BUILDING linking] $@"
+	@rm -f $@
+	@$(objs_dir_guard)
+	@$(LINKER) -T $(LINKER_SCRIPT_FILE) -o $@ \
+								$(CRTI_O_FILE) $(CRTBEGIN_O_FILE) \
+								$(OBJS_ASM_FILES_WITHOUT_CRTIN_OBJS_FOR_LINKER) \
+								$(OBJS_C_FILES) \
+								$(CRTEND_O_FILE) $(CRTN_O_FILE) \
+								$(LINKER_FLAGS)
+	@if ! grub-file --is-x86-multiboot $@; then \
+        echo [ERROR linking] $@ is not a multiboot! ; \
 		exit 1 ; \
     fi
 
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
 
-$(OBJDIR)/start.o: $(ARCHI386DIR)/start.asm
-	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
+$(LINKER_SCRIPT_FILE):
+	@echo "[ERROR ld]: $@ NOT EXIST!"
 
-$(OBJDIR)/kmain.o: $(SRCDIR)/kmain.c $(ARCHI386DIR)/egatextmode/egatextmode.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+# Compile C
+$(OBJS_DIR)/%.o: %.c $(SRCS_H_FILES)
+	@echo "[BUILDING c] $@"
+	@rm -f $@
+	@$(objs_dir_guard)
+	@$(GCC) -c $< -o $@ $(GCC_FLAGS)
 
-$(OBJDIR)/egatextmode.o: $(ARCHI386DIR)/egatextmode/egatextmode.c $(ARCHI386DIR)/egatextmode/egatextmode.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
+# Assembly asm
+$(OBJS_DIR)/%.o: %.asm
+	@echo "[BUILDING asm] $@"
+	@rm -f $@
+	@$(objs_dir_guard)
+	@$(NASM) $(NASM_FLAGS) $< -o $@
 
-$(OBJDIR)/other.o: $(ARCHI386DIR)/other/other.c $(ARCHI386DIR)/other/other.h $(ARCHI386DIR)/vmm/pde.h $(ARCHI386DIR)/vmm/pte.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(OBJDIR)/tlb_flush.o: $(ARCHI386DIR)/vmm/tlb_flush.asm
-	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
-
-$(OBJDIR)/pde.o: $(ARCHI386DIR)/vmm/pde.c $(ARCHI386DIR)/vmm/pde.h $(LIBCINCLUDEDIR)/bits.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(OBJDIR)/pte.o: $(ARCHI386DIR)/vmm/pte.c $(ARCHI386DIR)/vmm/pte.h $(LIBCINCLUDEDIR)/bits.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(OBJDIR)/gdt.o: $(ARCHI386DIR)/gdt/gdt.c $(ARCHI386DIR)/gdt/gdt.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(OBJDIR)/gdt_flush.o: $(ARCHI386DIR)/gdt/gdt_flush.asm
-	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
-
-$(OBJDIR)/interrupts.o: $(ARCHI386DIR)/interrupts/interrupts.c $(ARCHI386DIR)/interrupts/interrupts.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(OBJDIR)/exceptions.o: $(ARCHI386DIR)/interrupts/exceptions/exceptions.c $(ARCHI386DIR)/interrupts/exceptions/exceptions.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(OBJDIR)/idt.o: $(ARCHI386DIR)/interrupts/idt/idt.c $(ARCHI386DIR)/interrupts/idt/idt.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(OBJDIR)/idt_flush.o: $(ARCHI386DIR)/interrupts/idt/idt_flush.asm
-	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
-
-$(OBJDIR)/isrs.o: $(ARCHI386DIR)/interrupts/isrs.asm
-	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
-
-$(OBJDIR)/isr_handler.o: $(ARCHI386DIR)/interrupts/isr_handler.c $(ARCHI386DIR)/interrupts/isr_handler.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(OBJDIR)/pic.o: $(ARCHI386DIR)/interrupts/pic.c $(ARCHI386DIR)/interrupts/pic.h $(ARCHI386DIR)/inlineassembly/inlineassembly.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(OBJDIR)/inlineassembly.o: $(ARCHI386DIR)/inlineassembly/inlineassembly.c $(ARCHI386DIR)/inlineassembly/inlineassembly.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(OBJDIR)/pit.o: $(ARCHI386DIR)/pit/pit.c $(ARCHI386DIR)/pit/pit.h $(ARCHI386DIR)/inlineassembly/inlineassembly.h
-	$(UTILSPATH)/$(CC) -c $< -o $@ $(CFLAGS)
-
-$(CRTIOBJ): $(ARCHI386DIR)/crti.asm
-	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
-
-$(CRTNOBJ): $(ARCHI386DIR)/crtn.asm
-	$(ASSEMBLER) $(ASSEMBLERFLAGS) $< -o $@
-
-clean: libcclean
-	rm -r -f $(OBJDIR)
-	rm -r -f $(KERNELBINFILENAME)
-	rm -r -f $(BOOTABLEISOFILENAME)
-
-showvars:
-	@echo $(ASMSRCFILES)
-	@echo $(ASMOBJFILES)
-	@echo $(ASMOBJLINKFILES)
-	@echo $(CSRCFILES)
-	@echo $(COBJFILES)
-
-QEMUFLAGS = -d int -no-reboot -m 128M -s -S -monitor stdio
-#QEMUFLAGS = -no-reboot -m 32M -s -S -monitor stdio
+# QEMU
+QEMU = qemu-system-i386
+#QEMUFLAGS = -d int -no-reboot -m 128M -s -S -monitor stdio
+QEMUFLAGS = -no-reboot -m 32M -s -S -monitor stdio
 
 runqemu:
-	qemu-system-i386 $(QEMUFLAGS) $(BOOTABLEISOFILENAME)
+	$(QEMU) $(QEMUFLAGS) $(BOOTABLE_ISO_NAME)
+
+runqemu:
+
+
+clean:
+	rm -f $(KERNEL_BIN_NAME)
+	rm -f $(BOOTABLE_ISO_NAME)
+	rm -f $(ISO_DIR)/boot/$(KERNEL_BIN_NAME)
+	rm -rf $(BUILD_DIR)
+
+showvars:
+#	@echo $(SRCS_C_FILES)
+#	@echo $(SRCS_ASM_FILES)
+#	@echo --------
+#	@echo $(OBJS_C_FILES)
+#	@echo $(OBJS_ASM_FILES)

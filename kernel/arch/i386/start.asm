@@ -11,12 +11,11 @@ FLAGS     equ MBALIGN | MEMINFO \
 CHECKSUM  equ -(MAGIC + FLAGS)   ; checksum, value "which, when added to the other magic fields (i.e. ‘magic’ and ‘flags’), must have a 32-bit unsigned sum of zero."
 
 EGAWIDTH  equ 80                 ; number of the columns
-EGAHEIGHT equ 25                 ; number of the lines
+EGAHEIGHT equ 24                 ; number of the lines
 
 ; The bootloader will search for this signature in the first 8 KiB of the kernel file, aligned at a 32-bit boundary.
 ; The signature is in its own section so the header can be forced to be within the first 8 KiB of the kernel file.
-section .multiboot.data
-align 4
+section .multiboot.data align=4
 ; Magic fields
 dd MAGIC
 dd FLAGS
@@ -37,11 +36,12 @@ dd 0
 ; The stack grows downwards on x86.
 ; The stack on x86 must be 16-byte aligned according to the System V ABI standard and de-facto extensions.
 ; The compiler will assume the stack is properly aligned and failure to align the stack will result in undefined behavior.
-section .bootstrap_stack nobits alloc noexec write align=4 ; The information about the section is the same as that of a default bss
-align 16
+section .bootstrap_stack nobits alloc noexec write align=16 ; The information about the section is the same as that of a default bss
 bootstrap_stack_bottom:
 resb 16384 ; 16 KiB
 bootstrap_stack_top:
+
+global bootstrap_stack_top
 
 ; Preallocate pages used for paging.
 section .bss
@@ -57,6 +57,11 @@ extern _fini
 extern kmain
 extern _kernel_start
 extern _kernel_end
+
+; For start_higher_half.asm
+extern higher_half
+extern higher_half.halt
+
 ; Declare _start as a function symbol with the given symbol size.
 section .multiboot.text progbits alloc exec nowrite align=16 ; The information about the section is the same as that of a default text
 global _start;:function (_start.end - _start)
@@ -65,18 +70,18 @@ _start:
     mov edi, _kernel_end - 0xC0000000
     sub edi, _kernel_start
 
-    ; Check whether the whole kernel will fit into one page table (3 MiB)
-    ; 768 pages - 3 MiB (1 page for VGA video mem)
+    ; Check whether the whole kernel will fit into one page table (3 MiB) (First 1 MB reserved by )
+    ; 768 pages it's 3 MiB (1 page for VGA video mem)
     cmp edi, 4096 * (768 - 1)
-    ; halt if the kernel is more than 3 MiB
-    jge .halt
+    ; halt if the kernel size is more than 3 MiB
+    jge higher_half.halt
 
 
     ; Physical address of boot_page_table1
     mov edi, (boot_page_table1 - 0xC0000000)
-    ; Current page address
+    ; The physical address that the current page table entry points to (at the page table entry address in edi)
     mov esi, 0
-    ; Page counter for loop
+    ; Map 1023 pages. The 1024th will be the VGA text buffer.
     mov ecx, 1023
 
 .check_and_make_pt:
@@ -102,7 +107,7 @@ _start:
 
 .make_pt_end:
     ; Map VGA video memory to 0xC03FF000 as "present, writable".
-    mov [boot_page_table1 - 0xC0000000 + 1023 * 4], DWORD (0x000B8000 | 0x003)
+    mov [boot_page_table1 - 0xC0000000 + 1023 * 4], DWORD (0x000B8000 | 3)
 
     ; The page table is used at both page directory entry 0 (virtually from 0x0
     ; to 0x3FFFFF) (thus identity mapping the kernel) and page directory entry
@@ -111,9 +116,9 @@ _start:
     ; not change the next instruction, which continues to be physical. The CPU
     ; would instead page fault if there was no identity mapping.
 
-    ; Map the page table to both virtual addresses 0x00000000 and 0xC0000000.
-    mov [boot_page_directory - 0xC0000000 + 0], DWORD boot_page_table1 - 0xC0000000 + 3
-    mov [boot_page_directory - 0xC0000000 + 768 * 4], DWORD boot_page_table1 - 0xC0000000 + 3
+    ; Map the page table to both virtual addresses 0x00000000 and 0xC0000000 as "present, writable".
+    mov [boot_page_directory - 0xC0000000 + 0], DWORD (boot_page_table1 - 0xC0000000) + 3
+    mov [boot_page_directory - 0xC0000000 + 768 * 4], DWORD (boot_page_table1 - 0xC0000000) + 3
 
     ; Set cr3 to the address of the boot_page_directory.
     mov ecx, boot_page_directory - 0xC0000000
@@ -125,41 +130,8 @@ _start:
     mov cr0, ecx
 
     ; Jump to higher half with an absolute jump.
-    lea ecx, .higher_half
+    lea ecx, higher_half
     jmp ecx
-
-section .text
-.higher_half:
-    ; Unmap the identity mapping as it is now unnecessary.
-    mov [boot_page_directory + 0], DWORD 0
-
-    ; Reload cr3 to force a TLB flush so the changes to take effect.
-    mov ecx, cr3
-    mov cr3, ecx
-
-    ; The stack grows down.
-    ; The stack must be setting up before calling C functions.
-    mov esp, bootstrap_stack_top
-
-    ; Save EAX and EBX
-    push eax
-    push ebx
-    call _init
-    ; Restore EAX and EBX
-    pop ebx
-    pop eax
-    
-    ; Push EBX(physical address of the MBI) and EAX(Magic Number)
-    push ebx
-    push eax
-    call kmain
-    call _fini
-
-    cli
-.halt:
-    hlt
-    jmp .halt
-.end:
 
 ;section .rodata
 

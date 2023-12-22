@@ -17,6 +17,7 @@ SECTIONS
         *(.multiboot.data)
     }
     _multiboot_data_end = .;
+
     _multiboot_text_start = .;
     .multiboot.text : {
        *(.multiboot.text)

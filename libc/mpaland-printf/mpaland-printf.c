@@ -862,9 +862,7 @@ static int _vsnprintf(out_fct_type out, char* buffer, const size_t maxlen, const
 
 void _putchar(char character)
 {
-  #ifdef __is_libk
   ega_textmode_putch((unsigned char)character);
-  #endif
 }
 
 int printf_(const char* format, ...)

@@ -15,7 +15,6 @@ typedef struct
     uint32_t    edi, esi, ebp, esp, ebx, edx, ecx, eax;
     uint32_t    isr_num, err_code;
     uint32_t    eip, cs, eflags, useresp, userss;
- 
 }__attribute__((packed)) registers_t;
 
 #endif

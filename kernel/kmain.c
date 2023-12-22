@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "stdio.h"
+#include <stdio.h>
 #include "arch/i386/egatextmode/egatextmode.h"
 #include "arch/i386/other/other.h"
 #include "arch/i386/gdt/gdt.h"
@@ -15,11 +15,8 @@
 #ifdef __linux__
 #error "This is not intended to be compiled for Linux"
 #endif
-#ifndef __i386__
-#error "It is necessary to use the iX86 compiler"
-#endif
 #ifndef __i686__
-#warning "It is supposed to be compiled using the i686 cross-compiler"
+#warning "It is necessary to use the i686 compiler"
 #endif
 
 void kmain(uint32_t magic, multiboot_info_t* mbi_phys_addr)
@@ -50,5 +47,6 @@ void kmain(uint32_t magic, multiboot_info_t* mbi_phys_addr)
     printf_("Enabling interrupts...\n");
     __asm__ volatile("sti");
 
+    printf_("\n\nKernel finish(loop)\n");
     while(true);
 }

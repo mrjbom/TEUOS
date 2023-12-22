@@ -1,9 +1,10 @@
 #include "egatextmode.h"
+#include "../inlineassembly/inlineassembly.h"
 
 uint16_t* ega_textmode_buffer_addr = (uint16_t*)0xC03FF000;
 
 const uint8_t EGA_TEXTMODE_BUFFER_WIDTH = 80;
-const uint8_t EGA_TEXTMODE_BUFFER_HEIGHT = 25;
+const uint8_t EGA_TEXTMODE_BUFFER_HEIGHT = 24;
 
 uint8_t ega_textmode_xpos = 0;
 uint8_t ega_textmode_ypos = 0;
@@ -81,8 +82,6 @@ void ega_textmode_putch(uint8_t ch)
         ega_textmode_set_position(ega_textmode_xpos + 1, ega_textmode_ypos);
     }
 }
-
-#include "../inlineassembly/inlineassembly.h"
 
 void ega_textmode_scroll()
 {

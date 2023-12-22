@@ -1,6 +1,5 @@
 .vscode/
-**.o
-**.a
+build/
 iso/boot/kernel-0.bin
-initgdb
+initgdb.init
 kernel.map

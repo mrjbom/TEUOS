@@ -92,8 +92,19 @@ uint32_t* boot_page_directory = 0;
 
 multiboot_info_t* other_copy_multiboot_info_from_physical_addr(multiboot_info_t* mbi_phys_addr)
 {
+    // TODO: USE MULTIBOOT2
+
     // In first 1 mb?
-    if((uint32_t)mbi_phys_addr > 1048576) {
+    /* TODO:
+     * multiboot specification says:
+     * The Multiboot information structure and its related substructures may be placed anywhere in memory by the boot loader
+     * (with the exception of the memory reserved for the kernel and boot modules, of course)
+     * Now I hope that the entire structure is contained in the first megabyte of RAM, but this is not guaranteed, which means that I should ensure safe access to this memory (since virtual memory is enabled).
+     * Decisions:
+     * 1.(good) Managing virtual memory to read and copy data.
+     * 2.(bad and rude) copy the data at the start stage, before turning on the virtual memory.
+     */
+    if((uint32_t)mbi_phys_addr > 0x100000) {
         return 0;
     };
 
