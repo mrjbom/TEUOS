@@ -1,0 +1,16 @@
+multiboot info start:
+MBI addr: 0xC010A000
+MBI size: 1440
+Tags:
+-TAG-
+type: MULTIBOOT_TAG_TYPE_LOAD_BASE_ADDR
+size: 12
+load_base_addr: 0x00100000
+-TAG-
+type: MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME
+size: 32
+string: GRUB 2.12~rc1-10ubuntu4
+-TAG-
+type: MULTIBOOT_TAG_TYPE_END
+size: 8
+multiboot info end

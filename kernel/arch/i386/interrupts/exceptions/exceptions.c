@@ -3,6 +3,5 @@
 
 void exceptions_handler(registers_t regs)
 {
-    ega_textmode_set_position(0, 1);
-    printf_("EXCEPTION %u\n", regs.isr_num);
+    printf_serial("EXCEPTION %u\n", regs.isr_num);
 }

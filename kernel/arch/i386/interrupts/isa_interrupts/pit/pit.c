@@ -102,6 +102,6 @@ void pit_handler()
         hour++;
     }
     
-    //ega_textmode_set_position(0, 2);
-    //printf_("Time: %hhu hours %hhu minuts %hhu seconds", hour, min, sec);
+    //ega_textmode_set_position(0, 1);
+    //printf_ega("Time: %hhu hours %hhu minuts %hhu seconds", hour, min, sec);
 }

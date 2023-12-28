@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include "arch/i386/serial/serial_ports.h"
 #include "arch/i386/multiboot/multiboot_utils.h"
 #include "arch/i386/other/other.h"
 #include "arch/i386/egatextmode/egatextmode.h"
@@ -22,35 +23,36 @@
 // mbi_addr: virtual address of the multiboot info structure, that was copied in the start code
 void kmain(uint32_t magic, uint32_t mbi_addr)
 {
-    (void)magic;
-    if (magic != MULTIBOOT2_BOOTLOADER_MAGIC) { while (true); };
+    serial_init();
+
+    if (magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
+        printf_serial("[ERROR] Wrong magic number\n");
+        while (true);
+    };
 
     ega_textmode_init();
-    printf_("Hello from Kernel!\n\n\n");
+    printf_ega("Hello from Kernel!\n\n\n");
 
     //printf_("Setting up kernel sections permissions...\n");
     //other_setup_kernel_sections_permissions();
 
-    printf_("Setting up GDT...\n");
+    printf_ega("Setting up GDT...\n");
     gdt_init();
     
-    printf_("Setting up IDT...\n");
+    printf_ega("Setting up IDT...\n");
     idt_init();
 
-    printf_("Setting up PIC...\n");
+    printf_ega("Setting up PIC...\n");
     pic_init();
 
-    printf_("Setting up PIT...\n");
+    printf_ega("Setting up PIT...\n");
     pit_init();
 
-    printf_("Enabling interrupts...");
+    printf_ega("Enabling interrupts...\n");
     __asm__ volatile("sti");
-
-    ega_textmode_clear();
-    ega_textmode_set_position(0, 0);
 
     multiboot_print_mbi_info(mbi_addr);
 
-    printf_("\n\nKernel finish (loop)\n");
+    printf_ega("\n\nKernel finish (loop)\n");
     while (true);
 }
