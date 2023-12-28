@@ -4,5 +4,10 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
+#include <stdio.h>
+#include "../isr_handler.h"
+
+extern void exceptions_handler(registers_t regs);
 
 #endif

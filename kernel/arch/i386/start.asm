@@ -1,36 +1,51 @@
 BITS 32 ; generate code designed to run on a processor operating in 32-bit mode
 
 ; Multiboot header constants
-MAGIC     equ 0x1BADB002         ; 'magic' field
-; Flags
-MBALIGN   equ 1 << 0             ; boot modules must be alligned on page boundaries (4KB)
-MEMINFO   equ 1 << 1             ; provide memory map
-GRAPHICSF equ 1 << 2             ; enable graphics fields
-FLAGS     equ MBALIGN | MEMINFO \
-            | GRAPHICSF          ; 'flags' field
-CHECKSUM  equ -(MAGIC + FLAGS)   ; checksum, value "which, when added to the other magic fields (i.e. ‘magic’ and ‘flags’), must have a 32-bit unsigned sum of zero."
+MAGIC         equ 0xE85250D6                                      ; 'magic' field
+ARCH          equ 0                                               ; 32-bit (protected) mode of i386
+HEADER_LENGTH equ .multiboot_header_end - .multiboot_header_start ; length of Multiboot2 header in bytes including magic fields.
+CHECK_SUM     equ -(MAGIC + ARCH + HEADER_LENGTH)                 ; check sum
 
-EGAWIDTH  equ 80                 ; number of the columns
-EGAHEIGHT equ 24                 ; number of the lines
+EGA_WIDTH     equ 80                                              ; number of the columns
+EGA_HEIGHT    equ 24                                              ; number of the lines
 
-; The bootloader will search for this signature in the first 8 KiB of the kernel file, aligned at a 32-bit boundary.
-; The signature is in its own section so the header can be forced to be within the first 8 KiB of the kernel file.
-section .multiboot.data align=4
+MULTIBOOT_INFO_MAX_SIZE equ 4096 ; size of the memory to which the multiboot info will be copied
+
+; Multiboot2 header
+; The bootloader will search for this signature in the first 32 KiB of the kernel file, aligned at a 64-bit boundary.
+; The signature is in its own section so the header can be forced to be within the first 32 KiB of the kernel file.
+section .multiboot.data align=8
 ; Magic fields
+.multiboot_header_start:
 dd MAGIC
-dd FLAGS
-dd CHECKSUM
-; Address fields
-dd 0
-dd 0
-dd 0
-dd 0
-dd 0
-; Graphics fields
-dd 1
-dd EGAWIDTH
-dd EGAHEIGHT
-dd 0
+dd ARCH
+dd HEADER_LENGTH
+dd CHECK_SUM
+; Tags
+; 3.1.9 Flags tag
+align 8 ; every tag start at 8-bytes aligned address
+.flags_tag_start:
+dw 4                                                 ; type
+dw 0                                                 ; flags
+dd .flags_tag_end - .flags_tag_start                 ; size
+dd 10b                                               ; console_flags
+.flags_tag_end:
+; 3.1.10 The framebuffer tag of Multiboot2 header
+align 8
+.framebuffer_tag_start:
+dw 5                                                 ; type
+dw 0                                                 ; flags: it is not optional tag
+dd .framebuffer_tag_end - .framebuffer_tag_start     ; size
+dd EGA_WIDTH                                         ; width
+dd EGA_HEIGHT                                        ; height
+dd 0                                                 ; depth: text mode
+.framebuffer_tag_end:
+; Terminator tag
+align 8
+dw 0                                                 ; type
+dw 0                                                 ; flags
+dd 8                                                 ; size
+.multiboot_header_end:
 
 ; "The OS image must create its own stack as soon as it needs one."
 ; The stack grows downwards on x86.
@@ -42,6 +57,7 @@ resb 16384 ; 16 KiB
 bootstrap_stack_top:
 
 global bootstrap_stack_top
+global boot_page_directory
 
 ; Preallocate pages used for paging.
 section .bss
@@ -51,6 +67,10 @@ boot_page_directory:
 resb 4096
 boot_page_table1:
 resb 4096
+; Here we will copy the multiboot info
+align 8
+multiboot_info:
+resb MULTIBOOT_INFO_MAX_SIZE
 
 extern _init
 extern _fini
@@ -58,7 +78,7 @@ extern kmain
 extern _kernel_start
 extern _kernel_end
 
-; For start_higher_half.asm
+; From start_higher_half.asm
 extern higher_half
 extern higher_half.halt
 
@@ -67,7 +87,7 @@ section .multiboot.text progbits alloc exec nowrite align=16 ; The information a
 global _start;:function (_start.end - _start)
 _start:
     ; Calculate kernel size
-    mov edi, _kernel_end - 0xC0000000
+    mov edi, (_kernel_end - 0xC0000000)
     sub edi, _kernel_start
 
     ; Check whether the whole kernel will fit into one page table (3 MiB) (First 1 MB reserved by )
@@ -76,6 +96,20 @@ _start:
     ; halt if the kernel size is more than 3 MiB
     jge higher_half.halt
 
+    ; I want to copy the multiboot info to the bss
+    ; Get total_size(first 4 bytes at the beginning of the mbi) of multiboot info
+    mov ecx, [ebx]
+    cmp ecx, MULTIBOOT_INFO_MAX_SIZE
+    ; halt if multiboot information is more than MULTIBOOT_INFO_MAX_SIZE
+    jg higher_half.halt
+    ; Copy multiboot info
+    mov esi, ebx
+    mov edi, (multiboot_info - 0xC0000000)
+.copy_multiboot_info:
+    movsb
+    loop .copy_multiboot_info
+    ; Now we have a copy of the multibutton info, we will replace its old address with a new address(virtual)
+    mov ebx, multiboot_info
 
     ; Physical address of boot_page_table1
     mov edi, (boot_page_table1 - 0xC0000000)
@@ -118,10 +152,10 @@ _start:
 
     ; Map the page table to both virtual addresses 0x00000000 and 0xC0000000 as "present, writable".
     mov [boot_page_directory - 0xC0000000 + 0], DWORD (boot_page_table1 - 0xC0000000) + 3
-    mov [boot_page_directory - 0xC0000000 + 768 * 4], DWORD (boot_page_table1 - 0xC0000000) + 3
+    mov [boot_page_directory - 0xC0000000 + (768 * 4)], DWORD (boot_page_table1 - 0xC0000000) + 3
 
     ; Set cr3 to the address of the boot_page_directory.
-    mov ecx, boot_page_directory - 0xC0000000
+    mov ecx, (boot_page_directory - 0xC0000000)
     mov cr3, ecx
 
     ; Enable paging and the write-protect bit.

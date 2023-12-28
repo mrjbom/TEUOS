@@ -28,7 +28,7 @@ higher_half:
     pop ebx
     pop eax
     
-    ; Push EBX(physical address of the MBI) and EAX(Magic Number)
+    ; Push EBX(virtual address of the MBI copy) and EAX(Magic Number)
     push ebx
     push eax
     call kmain

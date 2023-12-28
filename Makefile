@@ -18,7 +18,7 @@ GCC_FLAGS = -O0 -g3 -std=gnu11 -ffreestanding -masm=intel -I$(LIBC_INCLUDE) $(GC
 
 # Assembler settings
 NASM = nasm
-NASM_FLAGS = -g -f elf32
+NASM_FLAGS = -g -f elf32 -w+error=all
 
 # Linker settings
 KERNEL_BIN_NAME = kernel-0.bin
@@ -116,7 +116,7 @@ $(KERNEL_BIN_FILE): $(LINKER_SCRIPT_FILE) $(OBJS_C_FILES) $(OBJS_ASM_FILES) $(CR
 								$(OBJS_C_FILES) \
 								$(CRTEND_O_FILE) $(CRTN_O_FILE) \
 								$(LINKER_FLAGS)
-	@if ! grub-file --is-x86-multiboot $@; then \
+	@if ! grub-file --is-x86-multiboot2 $@; then \
         echo [ERROR linking] $@ is not a multiboot! ; \
 		exit 1 ; \
     fi
@@ -141,8 +141,8 @@ $(OBJS_DIR)/%.o: %.asm
 
 # QEMU
 QEMU = qemu-system-i386
-#QEMUFLAGS = -d int -no-reboot -m 128M -s -S -monitor stdio
-QEMUFLAGS = -no-reboot -m 32M -s -S -monitor stdio
+#QEMUFLAGS = -d int -no-shutdown -no-reboot -m 128M -s -S -monitor stdio
+QEMUFLAGS = -no-shutdown -no-reboot -m 32M -s -S -monitor stdio
 
 runqemu:
 	$(QEMU) $(QEMUFLAGS) $(BOOTABLE_ISO_NAME)

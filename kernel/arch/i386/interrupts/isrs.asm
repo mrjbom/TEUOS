@@ -2,7 +2,7 @@
 global isr%1
 
 isr%1:
-    cli     ; usless if interrupt gate type
+    cli     ; usless if gate type is interrupt
     push 0  ; fake errorcode
     push %1 ; ISR num
     jmp isr_common_stub
@@ -13,13 +13,14 @@ isr%1:
 global isr%1
 
 isr%1:
-    cli     ; usless if interrupt gate type
+    cli     ; usless if gate type is interrupt
     push %1 ; ISR num
     jmp isr_common_stub
 
 %endmacro
 
 section .text
+; Exceptions
 ISR_NOERRCODE 0
 ISR_NOERRCODE 1
 ISR_NOERRCODE 2
@@ -72,8 +73,9 @@ ISR_NOERRCODE 46
 ISR_NOERRCODE 47
 
 extern isr_handler
+
 isr_common_stub:
-    pusha               ; push EAX, ECX, EDX, EBX, "original" ESP, EBP, ESI, EDI
+    pusha               ; push EAX, ECX, EDX, EBX, ESP(before pusha), EBP, ESI, EDI
 
     mov     eax, 0
     mov     ax, ds      ; save ds
@@ -93,6 +95,6 @@ isr_common_stub:
     mov     fs, ax
     mov     gs, ax
 
-    popa                ; pop EAX, ECX, EDX, EBX, "original" ESP, EBP, ESI, EDI
+    popa                ; pop EAX, ECX, EDX, EBX, ESP(before pusha), EBP, ESI, EDI
     add     esp, 8      ; delete error code and ISR num
     iret                ; pushed out of the stack: EIP, CS, EFLAGS, ESP, SS

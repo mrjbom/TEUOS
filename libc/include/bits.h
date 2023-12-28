@@ -2,15 +2,15 @@
 #define _BITS_H_
 
 /* Get bit from a number by position */
-#define get_bit(num, pos) ((num) & (1 << (pos)))
+#define bits_get_bit(num, pos) ((num) & (1 << (pos)))
 
 /* Set bit in a number by position */
-#define set_bit(num, pos) ((num) | (1 << (pos)))
+#define bits_set_bit(num, pos) ((num) | (1 << (pos)))
 
 /* Clear bit in a number by position */
-#define clear_bit(num, pos) ((num) & (~(1 << (pos))))
+#define bits_clear_bit(num, pos) ((num) & (~(1 << (pos))))
 
 /* Clear a few lower bits in a number */
-#define clear_lower_bits(num, count) ((num >> count) << count)
+#define bits_clear_lower_bits(num, count) ((num >> count) << count)
 
 #endif
