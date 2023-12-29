@@ -3,14 +3,33 @@ MBI addr: 0xC010A000
 MBI size: 1440
 Tags:
 -TAG-
-type: MULTIBOOT_TAG_TYPE_LOAD_BASE_ADDR
-size: 12
-load_base_addr: 0x00100000
--TAG-
-type: MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME
-size: 32
-string: GRUB 2.12~rc1-10ubuntu4
--TAG-
-type: MULTIBOOT_TAG_TYPE_END
-size: 8
+type: MULTIBOOT_TAG_TYPE_MMAP
+size: 160
+entry_version: 0
+mmap_entry[0]:
+base_addr: 0x0
+lenght: 0x9fc00
+type: MULTIBOOT_MEMORY_AVAILABLE
+mmap_entry[1]:
+base_addr: 0x9fc00
+lenght: 0x400
+type: MULTIBOOT_MEMORY_RESERVED
+mmap_entry[2]:
+base_addr: 0xf0000
+lenght: 0x10000
+type: MULTIBOOT_MEMORY_RESERVED
+mmap_entry[3]:
+base_addr: 0x100000
+lenght: 0x1ee0000
+type: MULTIBOOT_MEMORY_AVAILABLE
+mmap_entry[4]:
+base_addr: 0x1fe0000
+lenght: 0x20000
+type: MULTIBOOT_MEMORY_RESERVED
+mmap_entry[5]:
+base_addr: 0xfffc0000
+lenght: 0x40000
+type: MULTIBOOT_MEMORY_RESERVED
+total_memory_size 33488896
+size check OK
 multiboot info end

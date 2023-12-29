@@ -199,7 +199,7 @@ struct multiboot_mmap_entry
   multiboot_uint32_t type;
   multiboot_uint32_t zero;
 };
-typedef struct multiboot_mmap_entry multiboot_memory_map_t;
+typedef struct multiboot_mmap_entry multiboot_mmap_entry_t;
 
 struct multiboot_tag
 {
