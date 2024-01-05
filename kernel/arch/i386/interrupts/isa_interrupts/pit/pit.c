@@ -84,24 +84,20 @@ uint8_t sec = 0;
 void pit_handler()
 {
     pit_ticks++;
-    if (pit_ticks == 100)
-    {
+    if (pit_ticks == 100) {
         pit_ticks = 0;
         sec++;
     }
  
-    if (sec > 59)
-    {
+    if (sec > 59) {
         sec = 0;
         min++;
     }
  
-    if (min > 59)
-    {
+    if (min > 59) {
         min = 0;
         hour++;
     }
-    
     //ega_textmode_set_position(0, 1);
     //printf_ega("Time: %hhu hours %hhu minuts %hhu seconds", hour, min, sec);
 }

@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include "arch/i386/useful/useful_things.h"
 #include "arch/i386/serial/serial_ports.h"
 #include "arch/i386/multiboot/multiboot_utils.h"
 #include "arch/i386/other/other.h"
@@ -26,8 +27,7 @@ void kmain(uint32_t magic, uint32_t mbi_addr)
     serial_init();
 
     if (magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
-        printf_serial("[ERROR] Wrong magic number\n");
-        while (true);
+        kpanic("MULTIBOOT", "magic number invalid!", __FILE__, __LINE__);
     };
 
     ega_textmode_init();
@@ -49,10 +49,10 @@ void kmain(uint32_t magic, uint32_t mbi_addr)
     pit_init();
 
     printf_ega("Enabling interrupts...\n");
-    __asm__ volatile("sti");
+    asm volatile("sti");
 
     multiboot_print_mbi_info(mbi_addr);
 
-    printf_ega("\n\nKernel finish (loop)\n");
-    while (true);
+    printf_ega("\n\nKernel finish\n");
+    return;
 }

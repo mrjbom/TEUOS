@@ -31,5 +31,4 @@ base_addr: 0xfffc0000
 lenght: 0x40000
 type: MULTIBOOT_MEMORY_RESERVED
 total_memory_size 33488896
-size check OK
 multiboot info end

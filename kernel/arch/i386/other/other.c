@@ -1,7 +1,4 @@
 #include "other.h"
-#include "bits.h"
-#include "../vmm/pde.h"
-#include "../vmm/pte.h"
 
 // Start and end addresses of sections
 // .multiboot.data

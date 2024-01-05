@@ -7,14 +7,19 @@
 #include <string.h>
 
 /*
-    I plan to put various useful functions and macros here that can be useful everywhere.
+    Useful things that can be useful everywhere.
 */
 
 /*
+    Used by the kernel if some critical error has occurred. Outputs an error message to the serial port, and disables interrupts and stops execution.
+*/
+extern void kpanic(const char* title, const char* text, const char* file, int line);
+
+/*
     Checks if the address is aligned and aligns it if necessary.
-    addr_ptr: A pointer to the address to be checked and aligned
-    alignment: The address will be aligned to this value
-    Return: The number of bytes by which the address was aligned
+    @addr_ptr: A pointer to the address to be checked and aligned
+    @alignment: The address will be aligned to this value
+    @return: The number of bytes by which the address was aligned
 
     Example
     uint32_t addr = 0xC; // 12 not aligned

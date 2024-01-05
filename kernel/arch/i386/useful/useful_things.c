@@ -1,4 +1,18 @@
 #include "useful_things.h"
+#include <stdio.h>
+
+void kpanic(const char* title, const char* text, const char* file, int line)
+{
+    asm volatile ("cli");
+    printf_serial("\n[KERNEL PANIC]\n" \
+        "Title: %s\n" \
+        "Text: %s\n" \
+        "File: %s:%d\n", \
+        title, text, file, line \
+    );
+    
+    asm volatile ("l: jmp l");
+}
 
 size_t useful_align_to(uint32_t* addr_ptr, size_t alignment)
 {

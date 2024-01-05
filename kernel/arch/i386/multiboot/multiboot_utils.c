@@ -16,8 +16,7 @@ void multiboot_print_mbi_info(uint32_t mbi_addr)
     // The end tag has been reached
     bool end_tag_reached = false;
 
-    while (!end_tag_reached)
-    {
+    while (!end_tag_reached) {
         // every tag start at 8-bytes aligned address
         size_counter += useful_align_to(&current_addr, MULTIBOOT_INFO_ALIGN);
         
@@ -31,9 +30,6 @@ void multiboot_print_mbi_info(uint32_t mbi_addr)
                 //printf_serial("-TAG-\n");
                 //printf_serial("type: MULTIBOOT_TAG_TYPE_END\n");
                 //printf_serial("size: %u\n", tag_ptr->size);
-                
-                current_addr += tag_ptr->size;
-                size_counter += tag_ptr->size;
             }
             end_tag_reached = true;
             break;
@@ -44,9 +40,6 @@ void multiboot_print_mbi_info(uint32_t mbi_addr)
                 //printf_serial("type: MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME\n");
                 //printf_serial("size: %u\n", string_tag_ptr->size);
                 //printf_serial("string: %s\n", string_tag_ptr->string);
-                
-                current_addr += tag_ptr->size;
-                size_counter += tag_ptr->size;
             }
             break;
         case MULTIBOOT_TAG_TYPE_MMAP:
@@ -62,7 +55,7 @@ void multiboot_print_mbi_info(uint32_t mbi_addr)
                 // View every entry
 
                 size_t total_memory_size = 0;
-                for(uint32_t entry_index = 0; entry_index < entries_num; ++entry_index) {
+                for (uint32_t entry_index = 0; entry_index < entries_num; ++entry_index) {
                     uint32_t offset = 16 + (mmap_tag_ptr->entry_size * entry_index);
                     uint32_t mmap_entry_tag_addr = ((uint32_t)tag_ptr) + offset;
                     printf_serial("mmap_entry[%u]:\n", entry_index);
@@ -94,9 +87,6 @@ void multiboot_print_mbi_info(uint32_t mbi_addr)
                 }
 
                 printf_serial("total_memory_size %u\n", total_memory_size);
-                
-                current_addr += tag_ptr->size;
-                size_counter += tag_ptr->size;
             }
             break;
         case MULTIBOOT_TAG_TYPE_LOAD_BASE_ADDR:
@@ -106,22 +96,20 @@ void multiboot_print_mbi_info(uint32_t mbi_addr)
                 //printf_serial("type: MULTIBOOT_TAG_TYPE_LOAD_BASE_ADDR\n");
                 //printf_serial("size: %u\n", load_base_tag_ptr->size);
                 //printf_serial("load_base_addr: 0x%p\n", load_base_tag_ptr->load_base_addr);
-                
-                current_addr += tag_ptr->size;
-                size_counter += tag_ptr->size;
             }
             break;
         default:
             {
                 //printf_serial("Unknown multiboot info tag type: %u\n", tag_ptr->type);
                 //printf_serial("size: %u\n", tag_ptr->size);
-                
-                current_addr += tag_ptr->size;
-                size_counter += tag_ptr->size;
             }
             break;
         }
+        current_addr += tag_ptr->size;
+        size_counter += tag_ptr->size;
     }
-    printf_serial("size check %s", size_counter == total_size ? "OK\n" : "FAILED\n" );
+    if (size_counter != total_size) {
+        kpanic("MULTIBOOT INFO PRINT", "The size of all processed tags is not equal to the size contained in the multiboot info", __FILE__, __LINE__);
+    }
     printf_serial("multiboot info end\n");
 }

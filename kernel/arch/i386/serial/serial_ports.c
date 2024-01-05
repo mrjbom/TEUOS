@@ -14,9 +14,8 @@ void serial_init()
     outb(SERIAL_PORT_COM1 + 0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
 
     // Check if serial is faulty (i.e: not same byte as sent)
-    if(inb(SERIAL_PORT_COM1 + 0) != 0xAE) {
-        // Error
-        while (true);
+    if (inb(SERIAL_PORT_COM1 + 0) != 0xAE) {
+        asm volatile ("l: jmp l");
         return;
     }
 
