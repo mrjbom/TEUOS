@@ -22,11 +22,11 @@ extern void kpanic(const char* title, const char* text, const char* file, int li
     @return: The number of bytes by which the address was aligned
 
     Example
-    uint32_t addr = 0xC; // 12 not aligned
-    uint32_t new_bytes = useful_align_to(&addr, 8);
+    uintptr_t addr = 0xC; // 12 not aligned
+    size_t new_bytes = useful_align_to(&addr, 8);
     printf("0x%x %u", addr, new_bytes);
     0x10 4
 */
-extern size_t useful_align_to(uint32_t* addr_ptr, size_t alignment);
+extern size_t useful_align_to(uintptr_t* addr_ptr, size_t alignment);
 
 #endif

@@ -3,7 +3,7 @@
 
 typedef struct multiboot_tag_load_base_addr multiboot_tag_load_base_addr_t;
 
-void multiboot_print_mbi_info(uint32_t mbi_addr)
+void multiboot_print_mbi_info(uintptr_t mbi_addr)
 {
     printf_serial("multiboot info start:\n");
     printf_serial("MBI addr: 0x%p\n", mbi_addr);
@@ -11,17 +11,17 @@ void multiboot_print_mbi_info(uint32_t mbi_addr)
     printf_serial("MBI size: %u\n", total_size);
     printf_serial("Tags:\n");
     // Skip total_size and reserved fields
-    uint32_t current_addr = mbi_addr + 8;
+    uintptr_t current_tag_addr = mbi_addr + 8;
     uint32_t size_counter = 0 + 8;
     // The end tag has been reached
     bool end_tag_reached = false;
 
     while (!end_tag_reached) {
         // every tag start at 8-bytes aligned address
-        size_counter += useful_align_to(&current_addr, MULTIBOOT_INFO_ALIGN);
+        size_counter += useful_align_to(&current_tag_addr, MULTIBOOT_INFO_ALIGN);
         
         // Get tag
-        multiboot_tag_t* tag_ptr = (multiboot_tag_t*)(current_addr);
+        multiboot_tag_t* tag_ptr = (multiboot_tag_t*)(current_tag_addr);
         uint32_t tag_type = tag_ptr->type;
         switch (tag_type)
         {
@@ -52,12 +52,12 @@ void multiboot_print_mbi_info(uint32_t mbi_addr)
                 printf_serial("entry_version: %u\n", mmap_tag_ptr->entry_version);
                 // Subtract the size of the variables going before the entries
                 size_t entries_num = (mmap_tag_ptr->size - 16) / mmap_tag_ptr->entry_size;
+                
                 // View every entry
-
                 size_t total_memory_size = 0;
                 for (uint32_t entry_index = 0; entry_index < entries_num; ++entry_index) {
                     uint32_t offset = 16 + (mmap_tag_ptr->entry_size * entry_index);
-                    uint32_t mmap_entry_tag_addr = ((uint32_t)tag_ptr) + offset;
+                    uintptr_t mmap_entry_tag_addr = ((uint32_t)tag_ptr) + offset;
                     printf_serial("mmap_entry[%u]:\n", entry_index);
                     multiboot_mmap_entry_t* mmap_entry_tag_ptr = (multiboot_mmap_entry_t*)mmap_entry_tag_addr;
                     printf_serial("base_addr: 0x%llx\n", mmap_entry_tag_ptr->addr);
@@ -105,7 +105,7 @@ void multiboot_print_mbi_info(uint32_t mbi_addr)
             }
             break;
         }
-        current_addr += tag_ptr->size;
+        current_tag_addr += tag_ptr->size;
         size_counter += tag_ptr->size;
     }
     if (size_counter != total_size) {

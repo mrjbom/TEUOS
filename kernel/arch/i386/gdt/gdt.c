@@ -5,7 +5,7 @@
 
 gdt_entry_t gdt[GDT_SIZE];
 
-gdtr_data gdtr_data_ptr;
+gdtr_data_t gdtr_data;
 
 void gdt_init(void)
 {
@@ -52,11 +52,11 @@ void gdt_init(void)
     );
 
     // Fill GDTR
-    gdtr_data_ptr.limit = sizeof(gdt) - 1;
-    gdtr_data_ptr.base = (uint32_t)&gdt;
+    gdtr_data.limit = sizeof(gdt) - 1;
+    gdtr_data.base = (uint32_t)&gdt;
 
     // Load GDTR
-    gdt_flush((uint32_t)&gdtr_data_ptr);
+    gdt_flush((uintptr_t)&gdtr_data);
 }
 
 gdt_entry_t gdt_create_descriptor(uint32_t base, uint32_t limit, uint8_t access, uint8_t flags)

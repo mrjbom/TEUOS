@@ -14,7 +14,7 @@ void kpanic(const char* title, const char* text, const char* file, int line)
     asm volatile ("l: jmp l");
 }
 
-size_t useful_align_to(uint32_t* addr_ptr, size_t alignment)
+size_t useful_align_to(uintptr_t* addr_ptr, size_t alignment)
 {
     size_t extra = *addr_ptr % alignment;
     if (extra != 0) {

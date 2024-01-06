@@ -24,7 +24,7 @@
 #define PIC_ICW4_BUF_MASTER 0x0C        // Buffered mode/master */
 #define PIC_ICW4_SFNM       0x10        // Special fully nested (not) */
 
-#define PIC_EOI         0x20        // End-of-interrupt command code
+#define PIC_EOI             0x20        // End-of-interrupt command code
 
 /* Init PIC (remap) */
 extern void pic_init(void);

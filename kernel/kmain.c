@@ -6,7 +6,6 @@
 #include "arch/i386/useful/useful_things.h"
 #include "arch/i386/serial/serial_ports.h"
 #include "arch/i386/multiboot/multiboot_utils.h"
-#include "arch/i386/other/other.h"
 #include "arch/i386/egatextmode/egatextmode.h"
 #include "arch/i386/gdt/gdt.h"
 #include "arch/i386/interrupts/idt/idt.h"
@@ -22,7 +21,7 @@
 
 // magic: multiboot2 magic number must be equal to MULTIBOOT2_BOOTLOADER_MAGIC
 // mbi_addr: virtual address of the multiboot info structure, that was copied in the start code
-void kmain(uint32_t magic, uint32_t mbi_addr)
+void kmain(uint32_t magic, uintptr_t mbi_addr)
 {
     serial_init();
 

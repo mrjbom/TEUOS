@@ -28,9 +28,9 @@ extern void pte_add_attrib(pt_entry* entry, uint32_t attrib);
 extern void pte_del_attrib(pt_entry* entry, uint32_t attrib);
 
 /* Set page table entry frame address */
-extern void pte_set_frame_addr(pt_entry* entry, uint32_t frame_addr);
+extern void pte_set_frame_addr(pt_entry* entry, uintptr_t frame_addr);
 
 /* Get page table entry frame address */
-extern uint32_t* pte_get_frame_addr(pt_entry entry);
+extern uintptr_t pte_get_frame_addr(pt_entry entry);
 
 #endif

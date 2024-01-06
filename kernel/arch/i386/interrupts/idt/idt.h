@@ -22,10 +22,10 @@ typedef struct
 {
     uint16_t limit;
     uint32_t base;
-} __attribute__((packed)) idtr_data;
+} __attribute__((packed)) idtr_data_t;
 
 /* Load IDTR */
-extern void idt_flush(uint32_t);
+extern void idt_flush(uintptr_t);
 
 /* Create IDT and fill IDT and load IDT */
 extern void idt_init(void);

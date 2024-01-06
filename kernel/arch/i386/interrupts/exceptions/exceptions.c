@@ -1,5 +1,5 @@
 #include "exceptions.h"
-#include "../../egatextmode/egatextmode.h"
+#include <stdio.h>
 
 void exceptions_handler(registers_t regs)
 {

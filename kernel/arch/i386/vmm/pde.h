@@ -28,9 +28,9 @@ extern void pde_add_attrib(pd_entry* entry, uint32_t attrib);
 extern void pde_del_attrib(pd_entry* entry, uint32_t attrib);
 
 /* Set page directory entry frame address */
-extern void pde_set_frame_addr(pd_entry* entry, uint32_t frame_addr);
+extern void pde_set_frame_addr(pd_entry* entry, uintptr_t frame_addr);
 
 /* Get page directory entry frame address */
-extern uint32_t* pde_get_frame_addr(pd_entry entry);
+extern uintptr_t pde_get_frame_addr(pd_entry entry);
 
 #endif

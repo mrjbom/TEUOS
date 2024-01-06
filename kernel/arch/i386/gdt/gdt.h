@@ -34,10 +34,10 @@ typedef struct
 {
     uint16_t limit;
     uint32_t base;
-} __attribute__((packed)) gdtr_data;
+} __attribute__((packed)) gdtr_data_t;
 
 /* Load GDTR */
-extern void gdt_flush(uint32_t);
+extern void gdt_flush(uintptr_t);
 
 /* Create GDT and fill GDT and load GDT */
 extern void gdt_init(void);

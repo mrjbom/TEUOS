@@ -5,7 +5,7 @@
 
 idt_entry_t idt[IDT_SIZE];
 
-idtr_data idtr_data_ptr;
+idtr_data_t idtr_data;
 
 void idt_init(void)
 {
@@ -63,11 +63,11 @@ void idt_init(void)
     idt[47] = idt_create_descriptor((uint32_t)isr47, 0x08, GATE_TYPE(0xE) | GATE_DPL(0) | GATE_P(1));
 
     //Fill IDTR
-    idtr_data_ptr.limit = sizeof(idt) - 1;
-    idtr_data_ptr.base = (uint32_t)&idt;
+    idtr_data.limit = sizeof(idt) - 1;
+    idtr_data.base = (uint32_t)&idt;
 
     //Load IDTR
-    idt_flush((uint32_t)&idtr_data_ptr);
+    idt_flush((uintptr_t)&idtr_data);
 }
 
 idt_entry_t idt_create_descriptor(uint32_t offset, uint16_t selector, uint8_t flags)

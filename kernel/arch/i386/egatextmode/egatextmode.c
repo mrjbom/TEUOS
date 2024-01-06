@@ -99,7 +99,7 @@ void ega_textmode_scroll()
         memcpy(
             (ega_textmode_buffer_addr + ((y - 1) * EGA_TEXTMODE_BUFFER_WIDTH)),
             (ega_textmode_buffer_addr + ((y) * EGA_TEXTMODE_BUFFER_WIDTH)),
-            EGA_TEXTMODE_BUFFER_WIDTH * 2
+            EGA_TEXTMODE_BUFFER_WIDTH * sizeof(uint16_t)
         );
     }
     // Clear bottom line

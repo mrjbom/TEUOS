@@ -2,8 +2,8 @@
 
 void* memcpy(void* dest, const void* src, size_t num)
 {
-    char *d = dest;
-    const char *s = src;
+    char* d = dest;
+    const char* s = src;
     while (num--) {
         *d++ = *s++;
     }
