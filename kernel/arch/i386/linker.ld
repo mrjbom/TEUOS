@@ -57,4 +57,5 @@ SECTIONS
     }
     /* Add a symbol that indicates the end address of the kernel. */
     _kernel_end = .;
+    _kernel_size = (_kernel_end - 0xC0000000) - _kernel_start;
 }

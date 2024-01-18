@@ -7,6 +7,9 @@
 #include <string.h>
 #include <stdio.h>
 
+// Disables initialization and work with COM1
+//#define SERIAL_DISABLE
+
 // Port addresses
 #define SERIAL_PORT_COM1 0x3F8
 

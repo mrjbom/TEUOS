@@ -3,6 +3,10 @@
 
 void serial_init()
 {
+    #ifdef SERIAL_DISABLE
+        return;
+    #endif
+
     outb(SERIAL_PORT_COM1 + 1, 0x00);    // Disable all interrupts
     outb(SERIAL_PORT_COM1 + 3, 0x80);    // Enable DLAB (set baud rate divisor)
     outb(SERIAL_PORT_COM1 + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
@@ -11,6 +15,10 @@ void serial_init()
     outb(SERIAL_PORT_COM1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
     outb(SERIAL_PORT_COM1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
     outb(SERIAL_PORT_COM1 + 4, 0x1E);    // Set in loopback mode, test the serial chip
+    
+    // This code block should be commented out to work in VirtualBox
+    // This check always fails in VirtualBox
+    ///*
     outb(SERIAL_PORT_COM1 + 0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
 
     // Check if serial is faulty (i.e: not same byte as sent)
@@ -18,6 +26,7 @@ void serial_init()
         asm volatile ("l: jmp l");
         return;
     }
+    //*/
 
     // If serial is not faulty set it in normal operation mode
     // (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)
@@ -27,16 +36,25 @@ void serial_init()
 
 int serial_is_transmit_empty()
 {
+    #ifdef SERIAL_DISABLE
+        return 0;
+    #endif
     return inb(SERIAL_PORT_COM1 + 5) & 0x20;
 }
 
 void serial_putch(char ch)
 {
+    #ifdef SERIAL_DISABLE
+        return;
+    #endif
     serial_write_COM1((uint8_t)ch);
 }
 
 void serial_write_COM1(uint8_t b)
 {
+    #ifdef SERIAL_DISABLE
+        return;
+    #endif
     while (serial_is_transmit_empty() == 0);
     outb(SERIAL_PORT_COM1, b);
 }

@@ -17,6 +17,9 @@ int printf_ega(const char* format, ...)
 
 int printf_serial(const char* format, ...)
 {
+    #ifdef SERIAL_DISABLE
+        return 0;
+    #endif
     va_list va;
     va_start(va, format);
     char serial_text_buffer[256];
