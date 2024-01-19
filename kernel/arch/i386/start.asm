@@ -22,8 +22,17 @@ dd ARCH
 dd HEADER_LENGTH
 dd CHECK_SUM
 ; Tags
-; 3.1.9 Flags tag
+; 3.1.4 Multiboot2 information request
 align 8 ; every tag start at 8-bytes aligned address
+.information_request_tag_start:
+dw 1                                                             ; type
+dw 0                                                             ; flags
+dd .information_request_tag_end - .information_request_tag_start ; size
+dd 6                                                             ; mbi_tag_types[]
+; 6 - Memory map
+.information_request_tag_end:
+; 3.1.9 Flags tag
+align 8
 .flags_tag_start:
 dw 4                                                 ; type
 dw 0                                                 ; flags
