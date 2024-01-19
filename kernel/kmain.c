@@ -53,5 +53,11 @@ void kmain(uint32_t magic, uintptr_t mbi_addr)
     multiboot_print_mbi_info(mbi_addr);
 
     printf_ega("\n\nKernel finish\n");
+
+    ega_textmode_clear();
+    ega_textmode_set_position(0, 0);
+    for(int i = 0; i <= 24; ++i) {
+        printf_ega("%d\n", i);
+    }
     return;
 }

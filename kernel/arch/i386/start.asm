@@ -7,7 +7,7 @@ HEADER_LENGTH equ .multiboot_header_end - .multiboot_header_start ; length of Mu
 CHECK_SUM     equ -(MAGIC + ARCH + HEADER_LENGTH)                 ; check sum
 
 EGA_WIDTH     equ 80                                              ; number of the columns
-EGA_HEIGHT    equ 24                                              ; number of the lines
+EGA_HEIGHT    equ 25                                              ; number of the lines
 
 MULTIBOOT_INFO_MAX_SIZE equ 4096 ; size of the memory to which the multiboot info will be copied
 

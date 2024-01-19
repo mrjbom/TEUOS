@@ -4,10 +4,10 @@
 uint16_t* ega_textmode_buffer_addr = (uint16_t*)0xC03FF000;
 
 const uint8_t EGA_TEXTMODE_BUFFER_WIDTH = 80;
-const uint8_t EGA_TEXTMODE_BUFFER_HEIGHT = 24;
+const uint8_t EGA_TEXTMODE_BUFFER_HEIGHT = 25;
 
-uint8_t ega_textmode_xpos = 0;
-uint8_t ega_textmode_ypos = 0;
+uint8_t ega_textmode_x_pos = 0;
+uint8_t ega_textmode_y_pos = 0;
 
 uint8_t ega_textmode_color = 0;
 
@@ -39,18 +39,18 @@ void ega_textmode_set_position(uint8_t x, uint8_t y)
     if (x >= EGA_TEXTMODE_BUFFER_WIDTH || y >= EGA_TEXTMODE_BUFFER_HEIGHT) {
         return;
     }
-    ega_textmode_xpos = x;
-    ega_textmode_ypos = y;
+    ega_textmode_x_pos = x;
+    ega_textmode_y_pos = y;
 }
 
 uint8_t ega_textmode_get_x_position(void)
 {
-    return ega_textmode_xpos;
+    return ega_textmode_x_pos;
 }
 
 uint8_t ega_textmode_get_y_position(void)
 {
-    return ega_textmode_ypos;
+    return ega_textmode_y_pos;
 }
 
 void ega_textmode_clear(void)
@@ -62,24 +62,24 @@ void ega_textmode_clear(void)
 
 void ega_textmode_putch(uint8_t ch)
 {
-    if (ega_textmode_xpos >= EGA_TEXTMODE_BUFFER_WIDTH || ega_textmode_ypos >= EGA_TEXTMODE_BUFFER_HEIGHT) {
+    if (ega_textmode_x_pos >= EGA_TEXTMODE_BUFFER_WIDTH || ega_textmode_y_pos >= EGA_TEXTMODE_BUFFER_HEIGHT) {
         return;
     }
     if (ch == '\n') {
-        if (ega_textmode_ypos + 1 == EGA_TEXTMODE_BUFFER_HEIGHT) {
+        if (ega_textmode_y_pos + 1 == EGA_TEXTMODE_BUFFER_HEIGHT) {
             ega_textmode_scroll();
-            ega_textmode_set_position(0, ega_textmode_ypos);
+            ega_textmode_set_position(0, ega_textmode_y_pos);
         }
         else {
-            ega_textmode_set_position(0, ega_textmode_ypos + 1);
+            ega_textmode_set_position(0, ega_textmode_y_pos + 1);
         }
         return;
     }
-    uint16_t offset = (uint16_t)(ega_textmode_ypos * EGA_TEXTMODE_BUFFER_WIDTH + ega_textmode_xpos);
+    uint16_t offset = (uint16_t)(ega_textmode_y_pos * EGA_TEXTMODE_BUFFER_WIDTH + ega_textmode_x_pos);
     // Check textmode buffer overflow
     if (offset < EGA_TEXTMODE_BUFFER_WIDTH * EGA_TEXTMODE_BUFFER_HEIGHT) {
         ega_textmode_buffer_addr[offset] = ega_textmode_entry(ch, ega_textmode_color);
-        ega_textmode_set_position(ega_textmode_xpos + 1, ega_textmode_ypos);
+        ega_textmode_set_position(ega_textmode_x_pos + 1, ega_textmode_y_pos);
     }
 }
 

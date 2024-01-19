@@ -38,8 +38,8 @@ extern const uint8_t EGA_TEXTMODE_BUFFER_HEIGHT;
 /* Current text mode states */
 
 /*  Next symbol position */
-extern uint8_t ega_textmode_xpos;
-extern uint8_t ega_textmode_ypos;
+extern uint8_t ega_textmode_x_pos;
+extern uint8_t ega_textmode_y_pos;
 
 /* Current symbol color (foreground and background) */
 extern uint8_t ega_textmode_color;
