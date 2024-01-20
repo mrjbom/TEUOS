@@ -1,4 +1,4 @@
-.PHONY: all clean showvars
+.PHONY: all runqemu clean showvars
 
 BUILD_DIR = ./build
 OBJS_DIR = $(BUILD_DIR)/objs
