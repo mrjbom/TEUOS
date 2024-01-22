@@ -11,6 +11,7 @@
 #include "arch/i386/interrupts/idt/idt.h"
 #include "arch/i386/interrupts/pic.h"
 #include "arch/i386/interrupts/isa_interrupts/pit/pit.h"
+#include "arch/i386/mm/pmm/pmm.h"
 
 #ifdef __linux__
 #error "This is not intended to be compiled for Linux"
@@ -51,6 +52,9 @@ void kmain(uint32_t magic, uintptr_t mbi_addr)
     asm volatile("sti");
 
     multiboot_print_mbi_info(mbi_addr);
+
+    printf_ega("Setting up PMM...\n");
+    pmm_init(mbi_addr);
 
     printf_ega("\n\nKernel finish\n");
     return;

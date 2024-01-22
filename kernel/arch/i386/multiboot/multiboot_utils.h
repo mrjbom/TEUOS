@@ -8,6 +8,6 @@
 #include <stdio.h>
 #include "multiboot2.h"
 
-void multiboot_print_mbi_info(uintptr_t mbi_addr);
+extern void multiboot_print_mbi_info(uintptr_t mbi_addr);
 
 #endif
