@@ -1,5 +1,5 @@
 multiboot info start:
-MBI addr: 0xC010A000
+MBI addr: 0xC010B000
 MBI size: 1440
 Tags:
 -TAG-
