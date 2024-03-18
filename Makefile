@@ -144,7 +144,7 @@ QEMU = qemu-system-i386
 #QEMUFLAGS = -d int -no-shutdown -no-reboot -m 128M -s -S -monitor stdio
 QEMUFLAGS = -no-shutdown -no-reboot -m 32M -s -S -monitor stdio -serial file:serial.log
 
-runqemu:
+runqemu: all
 	$(QEMU) $(QEMUFLAGS) $(BOOTABLE_ISO_NAME)
 
 clean:

@@ -45,11 +45,11 @@ void multiboot_print_mbi_info(uintptr_t mbi_addr)
         case MULTIBOOT_TAG_TYPE_MMAP:
             {
                 multiboot_tag_mmap_t* mmap_tag_ptr = (multiboot_tag_mmap_t*)tag_ptr;
-                printf_serial("-TAG-\n");
-                printf_serial("type: MULTIBOOT_TAG_TYPE_MMAP\n");
-                printf_serial("size: %u\n", mmap_tag_ptr->size);
+                //printf_serial("-TAG-\n");
+                //printf_serial("type: MULTIBOOT_TAG_TYPE_MMAP\n");
+                //printf_serial("size: %u\n", mmap_tag_ptr->size);
                 //printf_serial("entry_size: %u\n", mmap_tag_ptr->entry_size);
-                printf_serial("entry_version: %u\n", mmap_tag_ptr->entry_version);
+                //printf_serial("entry_version: %u\n", mmap_tag_ptr->entry_version);
                 // Subtract the size of the variables going before the entries
                 size_t entries_num = (mmap_tag_ptr->size - 16) / mmap_tag_ptr->entry_size;
                 
@@ -58,34 +58,41 @@ void multiboot_print_mbi_info(uintptr_t mbi_addr)
                 for (uint32_t entry_index = 0; entry_index < entries_num; ++entry_index) {
                     uint32_t offset = 16 + (mmap_tag_ptr->entry_size * entry_index);
                     uintptr_t mmap_entry_tag_addr = ((uint32_t)tag_ptr) + offset;
-                    printf_serial("mmap_entry[%u]:\n", entry_index);
+                    //printf_serial("mmap_entry[%u]:\n", entry_index);
                     multiboot_mmap_entry_t* mmap_entry_tag_ptr = (multiboot_mmap_entry_t*)mmap_entry_tag_addr;
                     printf_serial("base_addr: 0x%llx\n", mmap_entry_tag_ptr->addr);
                     printf_serial("lenght: 0x%llx\n", mmap_entry_tag_ptr->len);
+                    //printf_ega("0x%llx (%llu) ", mmap_entry_tag_ptr->addr, mmap_entry_tag_ptr->len);
                     total_memory_size += (uint32_t)mmap_entry_tag_ptr->len;
                     switch (mmap_entry_tag_ptr->type)
                     {
                     case MULTIBOOT_MEMORY_AVAILABLE:
+                        //printf_ega("AVAIL\n");
                         printf_serial("type: MULTIBOOT_MEMORY_AVAILABLE\n");
                         break;
                     case MULTIBOOT_MEMORY_RESERVED:
+                        //printf_ega("RES\n");
                         printf_serial("type: MULTIBOOT_MEMORY_RESERVED\n");
                         break;
                     case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE:
+                        //printf_ega("ACPI\n");
                         printf_serial("type: MULTIBOOT_MEMORY_ACPI_RECLAIMABLE\n");
                         break;
                     case MULTIBOOT_MEMORY_NVS:
+                        //printf_ega("NVS\n");
                         printf_serial("type: MULTIBOOT_MEMORY_NVS\n");
                         break;
                     case MULTIBOOT_MEMORY_BADRAM:
+                        //printf_ega("BAD\n");
                         printf_serial("type: MULTIBOOT_MEMORY_BADRAM\n");
                         break;
                     default:
+                        //printf_ega("ERROR\n");
                         printf_serial("type: ERROR!\n");
                         break;
                     }
                 }
-
+                //printf_ega("%u\n", total_memory_size);
                 printf_serial("total_memory_size %u\n", total_memory_size);
             }
             break;

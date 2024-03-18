@@ -11,7 +11,7 @@
 #include "arch/i386/interrupts/idt/idt.h"
 #include "arch/i386/interrupts/pic.h"
 #include "arch/i386/interrupts/isa_interrupts/pit/pit.h"
-#include "arch/i386/mm/pmm/pmm.h"
+#include "arch/i386/mm/mm.h"
 
 #ifdef __linux__
 #error "This is not intended to be compiled for Linux"
@@ -25,7 +25,7 @@
 void kmain(uint32_t magic, uintptr_t mbi_addr)
 {
     serial_init();
-
+    
     if (magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
         kpanic("MULTIBOOT", "magic number invalid!", __FILE__, __LINE__);
     };
@@ -53,8 +53,8 @@ void kmain(uint32_t magic, uintptr_t mbi_addr)
 
     multiboot_print_mbi_info(mbi_addr);
 
-    printf_ega("Setting up PMM...\n");
-    pmm_init(mbi_addr);
+    printf_ega("Setting up MM...\n");
+    mm_init();
 
     printf_ega("\n\nKernel finish\n");
     return;
