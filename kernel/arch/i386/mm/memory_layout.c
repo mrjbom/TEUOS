@@ -1,4 +1,5 @@
 #include "memory_layout.h"
+#include <stdint.h>
 #include "mm.h"
 #include "../useful/useful_things.h"
 
