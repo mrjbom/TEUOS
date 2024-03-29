@@ -18,7 +18,7 @@ void serial_init()
     
     // This code block should be commented out to work in VirtualBox
     // This check always fails in VirtualBox
-    ///*
+    /*
     outb(SERIAL_PORT_COM1 + 0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
 
     // Check if serial is faulty (i.e: not same byte as sent)
@@ -26,7 +26,7 @@ void serial_init()
         asm volatile ("l: jmp l");
         return;
     }
-    //*/
+    */
 
     // If serial is not faulty set it in normal operation mode
     // (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)

@@ -20,11 +20,11 @@ extern void kpanic(const char* title, const char* text, const char* file, int li
 
 /*
     Checks if the address is aligned and aligns it if necessary.
-    @addr_ptr: A pointer to the address to be checked and aligned
-    @alignment: The address will be aligned to this value
-    @return: The number of bytes by which the address was aligned
+    addr_ptr: A pointer to the address to be checked and aligned
+    alignment: The address will be aligned to this value
+    return: The number of bytes by which the address was aligned
 
-    Example
+    Example:
     uintptr_t addr = 0xC; // 12 not aligned
     size_t new_bytes = useful_align_to(&addr, 8);
     printf("0x%x %u", addr, new_bytes);
