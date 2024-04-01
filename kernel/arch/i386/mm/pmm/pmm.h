@@ -24,7 +24,7 @@ typedef struct {
 extern size_t pmm_mbi_areas_count;
 extern pmm_memory_area_mbi_t pmm_mbi_areas[];
 // A list of free for use (multiboot type is available) areas, the list can be safely used to initialize allocators.
-// There are no areas below 1 MB, the areas are sorted, the areas are not occupied by the kernel, start addresses and sizes are aligned along the page boundaries.
+// There are no areas below 1 MB, the areas are sorted, the areas are not occupied by the kernel, start addresses and sizes are aligned along the page boundaries, the areas do not overlap each other.
 // The beginning of the first available zone does not start at 0x100000, because the kernel is loaded there, so this area starts immediately after the kernel.
 // This list should be used to initialize allocators and other things.
 extern size_t pmm_free_areas_count;
