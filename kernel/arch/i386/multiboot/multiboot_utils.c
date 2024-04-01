@@ -1,7 +1,80 @@
 #include "multiboot_utils.h"
 #include "../useful/useful_things.h"
+#include <stdio.h>
 
-typedef struct multiboot_tag_load_base_addr multiboot_tag_load_base_addr_t;
+bool multiboot_info_is_valid(uintptr_t mbi_addr, bool panic)
+{
+    uint32_t mbi_total_size = *(uint32_t*)(mbi_addr);
+    if (mbi_total_size == 0) {
+        if (panic) {
+            kpanic("MULTIBOOT", "MBI total_size is 0!", __FILE__, __LINE__);
+        }
+        return false;
+    }
+
+    // Skip total_size and reserved fields
+    uintptr_t current_tag_addr = mbi_addr + 8;
+    uint32_t mbi_size_counter = 0 + 8;
+    // The end tag has been reached
+    bool end_tag_reached = false;
+
+    while (mbi_size_counter < mbi_total_size) {
+        // Every tag start at 8-bytes aligned address
+        mbi_size_counter += useful_align_up(&current_tag_addr, MULTIBOOT_INFO_ALIGN);
+
+        // Get tag
+        multiboot_tag_t* current_tag_ptr = (multiboot_tag_t*)(current_tag_addr);
+
+        if (current_tag_ptr->type == MULTIBOOT_TAG_TYPE_END) {
+            end_tag_reached = true;
+            mbi_size_counter += current_tag_ptr->size;
+            break;
+        }
+        // Go to next tag
+        current_tag_addr += current_tag_ptr->size;
+        mbi_size_counter += current_tag_ptr->size;
+    }
+    if (!end_tag_reached) {
+        if (panic) {
+            kpanic("MULTIBOOT", "All the MBI memory was read, but the END TAG was not found!", __FILE__, __LINE__);
+        }
+        return false;
+    }
+    if (end_tag_reached && mbi_size_counter != mbi_total_size) {
+        if (panic) {
+            kpanic("MULTIBOOT", "The END TAG has been reached, but the size of the read MBI memory is not equal to the total size of the MBI!", __FILE__, __LINE__);
+        }
+        return false;
+    }
+    return true;
+}
+
+multiboot_tag_t* multiboot_get_tag_ptr(uintptr_t mbi_addr, uint32_t tag_type)
+{
+    bool end_tag_reached = false;
+    // Skip total_size and reserved fields
+    uintptr_t current_tag_addr = mbi_addr + 8;
+    while (!end_tag_reached) {
+        // Every tag start at 8-bytes aligned address
+        useful_align_up(&current_tag_addr, MULTIBOOT_INFO_ALIGN);
+
+        // Get tag
+        multiboot_tag_t* current_tag_ptr = (multiboot_tag_t*)(current_tag_addr);
+
+        if (current_tag_ptr->type == tag_type) {
+            // Tag was found
+            return current_tag_ptr;
+        }
+        if (current_tag_ptr->type == MULTIBOOT_TAG_TYPE_END) {
+            // Tag not found
+            return NULL;
+        }
+        // Go to next tag
+        current_tag_addr += current_tag_ptr->size;
+    }
+    // Unreachable
+    return NULL;
+}
 
 void multiboot_print_mbi_info(uintptr_t mbi_addr)
 {
@@ -18,7 +91,7 @@ void multiboot_print_mbi_info(uintptr_t mbi_addr)
 
     while (!end_tag_reached) {
         // every tag start at 8-bytes aligned address
-        size_counter += useful_align_to(&current_tag_addr, MULTIBOOT_INFO_ALIGN);
+        size_counter += useful_align_up(&current_tag_addr, MULTIBOOT_INFO_ALIGN);
         
         // Get tag
         multiboot_tag_t* tag_ptr = (multiboot_tag_t*)(current_tag_addr);
@@ -54,16 +127,16 @@ void multiboot_print_mbi_info(uintptr_t mbi_addr)
                 size_t entries_num = (mmap_tag_ptr->size - 16) / mmap_tag_ptr->entry_size;
                 
                 // View every entry
-                size_t total_memory_size = 0;
+                uint64_t total_memory_size = 0;
                 for (uint32_t entry_index = 0; entry_index < entries_num; ++entry_index) {
                     uint32_t offset = 16 + (mmap_tag_ptr->entry_size * entry_index);
                     uintptr_t mmap_entry_tag_addr = ((uint32_t)tag_ptr) + offset;
                     //printf_serial("mmap_entry[%u]:\n", entry_index);
                     multiboot_mmap_entry_t* mmap_entry_tag_ptr = (multiboot_mmap_entry_t*)mmap_entry_tag_addr;
                     printf_serial("base_addr: 0x%llx\n", mmap_entry_tag_ptr->addr);
-                    printf_serial("lenght: 0x%llx\n", mmap_entry_tag_ptr->len);
+                    printf_serial("lenght: %llu (0x%llx)\n", mmap_entry_tag_ptr->len, mmap_entry_tag_ptr->len);
                     //printf_ega("0x%llx (%llu) ", mmap_entry_tag_ptr->addr, mmap_entry_tag_ptr->len);
-                    total_memory_size += (uint32_t)mmap_entry_tag_ptr->len;
+                    total_memory_size += mmap_entry_tag_ptr->len;
                     switch (mmap_entry_tag_ptr->type)
                     {
                     case MULTIBOOT_MEMORY_AVAILABLE:
@@ -93,7 +166,7 @@ void multiboot_print_mbi_info(uintptr_t mbi_addr)
                     }
                 }
                 //printf_ega("%u\n", total_memory_size);
-                printf_serial("total_memory_size %u\n", total_memory_size);
+                printf_serial("total_memory_size %llu\n", total_memory_size);
             }
             break;
         case MULTIBOOT_TAG_TYPE_LOAD_BASE_ADDR:

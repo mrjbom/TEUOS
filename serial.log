@@ -1,24 +1,22 @@
-multiboot info start:
-MBI addr: 0xC010A000
-MBI size: 1440
-Tags:
+mbi areas (6):
 base_addr: 0x0
-lenght: 0x9fc00
-type: MULTIBOOT_MEMORY_AVAILABLE
+size: 654336
+type: AVAILABLE
 base_addr: 0x9fc00
-lenght: 0x400
-type: MULTIBOOT_MEMORY_RESERVED
+size: 1024
+type: RESERVED
 base_addr: 0xf0000
-lenght: 0x10000
-type: MULTIBOOT_MEMORY_RESERVED
+size: 65536
+type: RESERVED
 base_addr: 0x100000
-lenght: 0x1ee0000
-type: MULTIBOOT_MEMORY_AVAILABLE
+size: 32374784
+type: AVAILABLE
 base_addr: 0x1fe0000
-lenght: 0x20000
-type: MULTIBOOT_MEMORY_RESERVED
+size: 131072
+type: RESERVED
 base_addr: 0xfffc0000
-lenght: 0x40000
-type: MULTIBOOT_MEMORY_RESERVED
-total_memory_size 33488896
-multiboot info end
+size: 262144
+type: RESERVED
+free areas (1):
+base_addr: 0x111000
+size: 32305152 (0x1ecf000)

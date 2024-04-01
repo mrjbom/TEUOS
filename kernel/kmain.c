@@ -27,7 +27,7 @@ void kmain(uint32_t magic, uintptr_t mbi_addr)
     serial_init();
     
     if (magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
-        kpanic("MULTIBOOT", "magic number invalid!", __FILE__, __LINE__);
+        kpanic("MULTIBOOT", "Magic number invalid!", __FILE__, __LINE__);
     };
 
     ega_textmode_init();
@@ -51,11 +51,14 @@ void kmain(uint32_t magic, uintptr_t mbi_addr)
     printf_ega("Enabling interrupts...\n");
     asm volatile("sti");
 
-    multiboot_print_mbi_info(mbi_addr);
+    multiboot_info_is_valid(mbi_addr, true);
+
+    //multiboot_print_mbi_info(mbi_addr);
 
     printf_ega("Setting up MM...\n");
-    mm_init();
+    mm_init(mbi_addr);
 
     printf_ega("\n\nKernel finish\n");
+    //while(true);
     return;
 }
