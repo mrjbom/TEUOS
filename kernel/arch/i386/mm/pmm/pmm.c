@@ -121,61 +121,70 @@ static void fill_free_areas_info(void)
     pmm_free_areas[0].size -= kernel_size;
 
     // It's almost impossible, but you never know what
-    if (pmm_free_areas[0].size < PAGE_SIZE) {
+    if (pmm_free_areas[0].size < PAGE_SIZE * 2) {
         pmm_free_areas[0].addr = UINT32_MAX;
         pmm_free_areas[0].size = UINT32_MAX;
         pmm_free_areas_count--;
     }
 
-    // Sort areas by addreses
+    // Sort areas by addreses (deleted places to end)
     sort_areas(pmm_free_areas, pmm_free_areas_count);
 
     // Combine areas and fix overlapings
-    size_t old_pmm_free_areas_count = pmm_free_areas_count;
-    for (size_t i = old_pmm_free_areas_count - 1; i > 0; --i) {
-        // Are the areas adjacent but not overlapping?
-        // [ ]   {0, 1}
-        //   [ ] {1, 1}
-        // {0, 2}
-        if (pmm_free_areas[i - 1].addr + pmm_free_areas[i - 1].size == pmm_free_areas[i].addr) {
-            // Let's combine them into one
-            pmm_free_areas[i - 1].size += pmm_free_areas[i].size;
-            // Mark current as deleted
-            pmm_free_areas[i].addr = UINT32_MAX;
-            pmm_free_areas[i].size = UINT32_MAX;
-            pmm_free_areas_count--;
-        }
-        // Are the areas overlap? (Does the previous overlap the current?)
-        else if (pmm_free_areas[i - 1].addr + pmm_free_areas[i - 1].size > pmm_free_areas[i].addr) {
-            // The previous area overlaps the current
-            // Partially:
-            // prev.addr + prev.size < current.addr + current.size
-            // prev [    ]   {0, 4}
-            // curr   [    ] {2, 4}
-            // {0, 6}
-            // Fully:
-            // prev.addr + prev.size == current.addr + current.size
-            // prev [      ] {0, 6}
-            // curr   [    ] {2, 4}
-            // {0, 6}
-            // More than fully
-            // prev.addr + prev.size > current.addr + current.size
-            // prev [        ] {0, 8}
-            // curr   [    ]   {2, 4}
-            // {0, 8}
-            if (pmm_free_areas[i - 1].addr + pmm_free_areas[i - 1].size < pmm_free_areas[i].addr + pmm_free_areas[i].size) {
-                // The previous area partially overlaps the current
-                pmm_free_areas[i - 1].size = pmm_free_areas[i].addr + pmm_free_areas[i].size;
+    // Some types of overlaps cannot be fixed at one time.
+    // For example {0, 10} {2, 2} {6, 2}. During the first iteration, {2, 2} will be deleted, but another one will be needed to delete {6, 2}.
+    bool fix_occurs = false;
+    do {
+        fix_occurs = false;
+        // Combine areas and fix overlapings
+        size_t old_pmm_free_areas_count = pmm_free_areas_count;
+        for (size_t i = old_pmm_free_areas_count - 1; i > 0; --i) {
+            // Are the areas adjacent but not overlapping?
+            // [ ]   {0, 1}
+            //   [ ] {1, 1}
+            // {0, 2}
+            if (pmm_free_areas[i - 1].addr + pmm_free_areas[i - 1].size == pmm_free_areas[i].addr) {
+                // Let's combine them into one
+                pmm_free_areas[i - 1].size += pmm_free_areas[i].size;
+                // Mark current as deleted
+                pmm_free_areas[i].addr = UINT32_MAX;
+                pmm_free_areas[i].size = UINT32_MAX;
+                pmm_free_areas_count--;
+                fix_occurs = true;
             }
-            // In the remaining two overlaping cases (fully and more), it is enough just to delete the current area
-            // Mark current as deleted
-            pmm_free_areas[i].addr = UINT32_MAX;
-            pmm_free_areas[i].size = UINT32_MAX;
-            pmm_free_areas_count--;
+            // Are the areas overlap? (Does the previous overlap the current?)
+            else if (pmm_free_areas[i - 1].addr + pmm_free_areas[i - 1].size > pmm_free_areas[i].addr) {
+                // The previous area overlaps the current
+                // Partially:
+                // prev.addr + prev.size < current.addr + current.size
+                // prev [    ]   {0, 4}
+                // curr   [    ] {2, 4}
+                // {0, 6}
+                // Fully:
+                // prev.addr + prev.size == current.addr + current.size
+                // prev [      ] {0, 6}
+                // curr   [    ] {2, 4}
+                // {0, 6}
+                // More than fully
+                // prev.addr + prev.size > current.addr + current.size
+                // prev [        ] {0, 8}
+                // curr   [    ]   {2, 4}
+                // {0, 8}
+                if (pmm_free_areas[i - 1].addr + pmm_free_areas[i - 1].size < pmm_free_areas[i].addr + pmm_free_areas[i].size) {
+                    // The previous area partially overlaps the current
+                    pmm_free_areas[i - 1].size = pmm_free_areas[i].addr + pmm_free_areas[i].size;
+                }
+                // In the remaining two overlaping cases (fully and more), it is enough just to delete the current area
+                // Mark current as deleted
+                pmm_free_areas[i].addr = UINT32_MAX;
+                pmm_free_areas[i].size = UINT32_MAX;
+                pmm_free_areas_count--;
+                fix_occurs = true;
+            }
         }
-    }
-    // Places deleted to end
-    sort_areas(pmm_free_areas, old_pmm_free_areas_count);
+        // Places deleted to end
+        sort_areas(pmm_free_areas, old_pmm_free_areas_count);
+    } while (fix_occurs);
 
     // Iterating over pmm_free_areas array and correct the addresses and sizes so that the addresses and sizes are aligned on the page size
     for (size_t i = 0; i < pmm_free_areas_count; ++i) {
