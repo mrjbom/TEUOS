@@ -2,6 +2,7 @@
 #define _MEMORY_LAYOUT_H_
 
 #include <stdint.h>
+#include "mm.h"
 
 #define KERNEL_PA_TO_VA_OFFSET 0xC0000000
 #define KERNEL_PA_TO_VA(pa) ((pa) + KERNEL_PA_TO_VA_OFFSET)
@@ -38,6 +39,7 @@
  * 
  *
  *     Physical Address Space Layout
+ * REAL MODE FIRST MB: 0x0 - 0x100000
  * DMA ZONE: 0x100000 - 0x8000000 (15 MB)
  * NORMAL ZONE: 0x8000000 - 0x1C0000000 (880 MB)
  * HIGH ZONE: 0x1C0000000 - 100000000 (3200 MB)
@@ -91,12 +93,23 @@
 #define HIGH_ZONE_START_PA 0x38000000
 #define HIGH_ZONE_END_PA 0x100000000
 
-#define DMA_ZONE_START_VA 0xC0100000
-#define DMA_ZONE_END_VA 0xC1000000
-#define NORMAL_ZONE_START_VA 0xC1000000
-#define NORMAL_ZONE_END_VA 0xF8000000
-#define VMA_START_VA 0xF8000000
-#define VMA_END_VA 0x100000000
+#define DMA_ZONE_START_VA KERNEL_PA_TO_VA(DMA_ZONE_START_PA) // 0xC0100000
+#define DMA_ZONE_END_VA KERNEL_PA_TO_VA(DMA_ZONE_END_PA)// 0xC1000000
+#define NORMAL_ZONE_START_VA KERNEL_PA_TO_VA(NORMAL_ZONE_START_PA) // 0xC1000000
+#define NORMAL_ZONE_END_VA KERNEL_PA_TO_VA(NORMAL_ZONE_END_PA) // 0xF8000000
+//#define VMA_START_VA 0xF8000000
+//#define VMA_END_VA 0x100000000
+
+/*
+ * The numbers of the physical frames defining the zones. Useful for initializing bootstrap bitmap allocator.
+ * Attention: max pfn is also included in the zone and means the number of the last page in it.
+ */
+#define DMA_ZONE_MIN_PFN DMA_ZONE_START_PA / PAGE_SIZE
+#define DMA_ZONE_MAX_PFN DMA_ZONE_END_PA / PAGE_SIZE - 1
+#define NORMAL_ZONE_MIN_PFN NORMAL_ZONE_START_PA / PAGE_SIZE
+#define NORMAL_ZONE_MAX_PFN NORMAL_ZONE_END_PA / PAGE_SIZE - 1
+#define HIGH_ZONE_MIN_PFN HIGH_ZONE_START_PA / PAGE_SIZE
+#define HIGH_ZONE_MAX_PFN HIGH_ZONE_END_PA / PAGE_SIZE - 1
 
 /* 
  * Declared in the linker script
