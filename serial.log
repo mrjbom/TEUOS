@@ -1,22 +1,4 @@
-mbi areas (6):
-base_addr: 0x0
-size: 654336
-type: AVAILABLE
-base_addr: 0x9fc00
-size: 1024
-type: RESERVED
-base_addr: 0xf0000
-size: 65536
-type: RESERVED
-base_addr: 0x100000
-size: 32374784
-type: AVAILABLE
-base_addr: 0x1fe0000
-size: 131072
-type: RESERVED
-base_addr: 0xfffc0000
-size: 262144
-type: RESERVED
 free areas (1):
-base_addr: 0x111000
-size: 32305152 (0x1ecf000)
+base_addr: 0x131000
+size: 32174080 (0x1eaf000)
+200704 (31000)

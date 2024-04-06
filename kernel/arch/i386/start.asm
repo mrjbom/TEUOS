@@ -66,15 +66,15 @@ resb 16384 ; 16 KiB
 bootstrap_stack_top:
 
 global bootstrap_stack_top
-global boot_page_directory
+global bootstrap_page_directory
 
 ; Preallocate pages used for paging.
 section .bss
 ; Page directory and page table addresses must be page aligned
 align 4096
-boot_page_directory:
+bootstrap_page_directory:
 resb 4096
-boot_page_table1:
+bootstrap_page_table1:
 resb 4096
 ; Here we will copy the multiboot info
 align 8
@@ -120,8 +120,8 @@ _start:
     ; Now we have a copy of the multibutton info, we will replace its old address with a new address(virtual)
     mov ebx, multiboot_info
 
-    ; Physical address of boot_page_table1
-    mov edi, (boot_page_table1 - 0xC0000000)
+    ; Physical address of bootstrap_page_table1
+    mov edi, (bootstrap_page_table1 - 0xC0000000)
     ; The physical address that the current page table entry points to (at the page table entry address in edi)
     mov esi, 0
     ; Map 1023 pages. The 1024th will be the VGA text buffer.
@@ -141,7 +141,7 @@ _start:
     mov [edi], edx
 
 .increase:
-    ; Size of entries in boot_page_table1 is 4 bytes.
+    ; Size of entries in bootstrap_page_table1 is 4 bytes.
     add edi, 4
     ; Size of page is 4096 bytes.
     add esi, 4096
@@ -150,7 +150,7 @@ _start:
 
 .make_pt_end:
     ; Map VGA video memory to 0xC03FF000 as "present, writable".
-    mov [boot_page_table1 - 0xC0000000 + 1023 * 4], DWORD (0x000B8000 | 3)
+    mov [bootstrap_page_table1 - 0xC0000000 + 1023 * 4], DWORD (0x000B8000 | 3)
 
     ; The page table is used at both page directory entry 0 (virtually from 0x0
     ; to 0x3FFFFF) (thus identity mapping the kernel) and page directory entry
@@ -160,11 +160,11 @@ _start:
     ; would instead page fault if there was no identity mapping.
 
     ; Map the page table to both virtual addresses 0x00000000 and 0xC0000000 as "present, writable".
-    mov [boot_page_directory - 0xC0000000 + 0], DWORD (boot_page_table1 - 0xC0000000) + 3
-    mov [boot_page_directory - 0xC0000000 + (768 * 4)], DWORD (boot_page_table1 - 0xC0000000) + 3
+    mov [bootstrap_page_directory - 0xC0000000 + 0], DWORD (bootstrap_page_table1 - 0xC0000000) + 3
+    mov [bootstrap_page_directory - 0xC0000000 + (768 * 4)], DWORD (bootstrap_page_table1 - 0xC0000000) + 3
 
-    ; Set cr3 to the address of the boot_page_directory.
-    mov ecx, (boot_page_directory - 0xC0000000)
+    ; Set cr3 to the address of the bootstrap_page_directory.
+    mov ecx, (bootstrap_page_directory - 0xC0000000)
     mov cr3, ecx
 
     ; Enable paging and the write-protect bit.

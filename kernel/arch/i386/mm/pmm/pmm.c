@@ -17,6 +17,9 @@ pmm_memory_area_mbi_t pmm_mbi_areas[PMM_AREAS_MAX_NUMBER];
 size_t pmm_free_areas_count = 0;
 pmm_memory_free_area_t pmm_free_areas[PMM_AREAS_MAX_NUMBER];
 
+/*
+ * Copies areas info from MBI to pmm_mbi_areas
+ */
 static void copy_mbi_areas_info(uintptr_t mbi_addr)
 {
     multiboot_tag_mmap_t* mmap_tag_ptr = (multiboot_tag_mmap_t*)multiboot_get_tag_ptr(mbi_addr, MULTIBOOT_TAG_TYPE_MMAP);
@@ -46,7 +49,7 @@ static void copy_mbi_areas_info(uintptr_t mbi_addr)
 /*
  * Sort free areas (bubble sort)
  */
-static void sort_areas(pmm_memory_free_area_t* areas, size_t count)
+static void sort_free_areas(pmm_memory_free_area_t* areas, size_t count)
 {
     if (count < 2) {
         return;
@@ -65,7 +68,7 @@ static void sort_areas(pmm_memory_free_area_t* areas, size_t count)
 
 /*
  * Fill pmm_free_areas using pmm_mbi_areas
- * The code combines adjacent areas and fixes overlaps
+ * The code combines adjacent areas, fixes overlaps and combine areas
  */
 static void fill_free_areas_info(void)
 {
@@ -108,7 +111,7 @@ static void fill_free_areas_info(void)
     }
 
     // Sort areas by addreses
-    sort_areas(pmm_free_areas, pmm_free_areas_count);
+    sort_free_areas(pmm_free_areas, pmm_free_areas_count);
 
     // Remove memory used by the kernel
     // The area after the 0x100000 in which the kernel is located must be the first in the array
@@ -128,7 +131,7 @@ static void fill_free_areas_info(void)
     }
 
     // Sort areas by addreses (deleted places to end)
-    sort_areas(pmm_free_areas, pmm_free_areas_count);
+    sort_free_areas(pmm_free_areas, pmm_free_areas_count);
 
     // Combine areas and fix overlapings
     // Some types of overlaps cannot be fixed at one time.
@@ -183,7 +186,7 @@ static void fill_free_areas_info(void)
             }
         }
         // Places deleted to end
-        sort_areas(pmm_free_areas, old_pmm_free_areas_count);
+        sort_free_areas(pmm_free_areas, old_pmm_free_areas_count);
     } while (fix_occurs);
 
     // Iterating over pmm_free_areas array and correct the addresses and sizes so that the addresses and sizes are aligned on the page size
@@ -206,7 +209,7 @@ static void fill_free_areas_info(void)
 void pmm_init_memory_info(uintptr_t mbi_addr)
 {
     copy_mbi_areas_info(mbi_addr);
-    pmm_print_mbi_areas();
+    //pmm_print_mbi_areas();
     fill_free_areas_info();
     pmm_print_free_areas();
 }

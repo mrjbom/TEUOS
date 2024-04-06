@@ -1,4 +1,4 @@
-extern boot_page_directory
+extern bootstrap_page_directory
 extern bootstrap_stack_top
 extern _init
 extern _fini
@@ -10,7 +10,7 @@ global higher_half.halt
 section .text
 higher_half:
     ; Unmap the identity mapping as it is now unnecessary.
-    mov [boot_page_directory + 0], DWORD 0
+    mov [bootstrap_page_directory + 0], DWORD 0
 
     ; Reload cr3 to force a TLB flush so the changes to take effect.
     mov ecx, cr3
