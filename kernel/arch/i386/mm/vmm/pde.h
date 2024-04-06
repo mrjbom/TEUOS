@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-enum PAGE_PDE_FLAGS {
+enum PDE_FLAGS {
     PDE_PRESENT     = 1,            //00000000000000000000000000000001
     PDE_WRITABLE    = 2,            //00000000000000000000000000000010
     PDE_USER        = 4,            //00000000000000000000000000000100
@@ -20,17 +20,5 @@ enum PAGE_PDE_FLAGS {
 };
 
 typedef uint32_t pd_entry;
-
-/* Sets a flag in the page directory entry */
-extern void pde_add_attrib(pd_entry* entry, uint32_t attrib);
-
-/* Clear a flag in the page directory entry */
-extern void pde_del_attrib(pd_entry* entry, uint32_t attrib);
-
-/* Set page directory entry frame address */
-extern void pde_set_frame_addr(pd_entry* entry, uintptr_t frame_addr);
-
-/* Get page directory entry frame address */
-extern uintptr_t pde_get_frame_addr(pd_entry entry);
 
 #endif

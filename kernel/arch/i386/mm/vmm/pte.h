@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-enum PAGE_PTE_FLAGS {
+enum PTE_FLAGS {
     PTE_PRESENT         = 1,            //00000000000000000000000000000001
     PTE_WRITABLE        = 2,            //00000000000000000000000000000010
     PTE_USER            = 4,            //00000000000000000000000000000100
@@ -20,17 +20,5 @@ enum PAGE_PTE_FLAGS {
 };
 
 typedef uint32_t pt_entry;
-
-/* Sets a flag in the page table entry */
-extern void pte_add_attrib(pt_entry* entry, uint32_t attrib);
-
-/* Clear a flag in the page table entry */
-extern void pte_del_attrib(pt_entry* entry, uint32_t attrib);
-
-/* Set page table entry frame address */
-extern void pte_set_frame_addr(pt_entry* entry, uintptr_t frame_addr);
-
-/* Get page table entry frame address */
-extern uintptr_t pte_get_frame_addr(pt_entry entry);
 
 #endif

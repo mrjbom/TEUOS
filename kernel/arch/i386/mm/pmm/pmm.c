@@ -9,6 +9,9 @@
 #include "../../mm/memory_layout.h"
 #include "../mm.h"
 
+#define FIRST_1MB_END 0x100000
+#define FIRST_4GB_END 0x100000000ll
+
 #define PMM_AREAS_MAX_NUMBER 64
 
 size_t pmm_mbi_areas_count = 0;

@@ -10,9 +10,6 @@
  * Useful things that can be useful everywhere.
  */
 
-#define FIRST_1MB_END 0x100000
-#define FIRST_4GB_END 0x100000000ll
-
 /*
  * Used by the kernel if some critical error has occurred.
  * Disables interrupts, outputs an error message to the serial port and start endless loop.
