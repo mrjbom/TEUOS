@@ -15,7 +15,7 @@
 
 /*
  * Used by the kernel if some critical error has occurred.
- * Outputs an error message to the disables interrupts, serial port and start endless loop.
+ * Disables interrupts, outputs an error message to the serial port and start endless loop.
  */
 extern void kpanic(const char* title, const char* text, const char* file, int line);
 
