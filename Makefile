@@ -14,7 +14,7 @@ GCC_WARNINGS = -Werror -Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-a
             -Wredundant-decls -Wnested-externs -Winline -Wno-long-long \
             -Wconversion -Wstrict-prototypes
 LIBC_INCLUDE = $(SRCS_DIR)/libc/include
-GCC_FLAGS = -O0 -g3 -std=gnu11 -ffreestanding -masm=intel -I$(LIBC_INCLUDE) $(GCC_WARNINGS)
+GCC_FLAGS = -O0 -g3 -std=gnu11 -ffreestanding -masm=intel -save-temps -I$(LIBC_INCLUDE) $(GCC_WARNINGS)
 
 # Assembler settings
 NASM = nasm
