@@ -39,10 +39,12 @@
  * 
  *
  *     Physical Address Space Layout
- * REAL MODE FIRST MB: 0x0 - 0x100000
- * DMA ZONE: 0x100000 - 0x8000000 (15 MB)
- * NORMAL ZONE: 0x8000000 - 0x1C0000000 (880 MB)
- * HIGH ZONE: 0x1C0000000 - 100000000 (3200 MB)
+ * 0x0
+ * REAL MODE    1 MB
+ * DMA ZONE     15 MB
+ * NORMAL ZONE  880 MB
+ * HIGH ZONE    3200 MB
+ * 0x100000000
  * 
  * The DMA zone is required to work with some devices that cannot address memory above 16 megabytes.
  * Memory from this zone is allocated last, usually for the needs of the kernel when working with devices.
@@ -51,65 +53,54 @@
  * Also, memory for user applications is taken from here if it is not in the HIGH zone.
  * 
  * The HIGH zone is mainly used to allocate memory for user applications, the kernel does not allocate free pages for itself from this area.
- * If any data from this zone is needed by the kernel, then it will flood it into its VMA area.
+ * If any data from this zone is needed by the kernel, then it will map it to VMA area.
  * 
- * ---------------------------- 0x00000000
- * |         RESERVED         |
- * | DMA   KERNEL BINARY      | 0x100000 DMA ZONE START and kernel binary address
- * | DMA   KERNEL BINARY      | (kernel sections) (size: < 4 MB)
- * | DMA                      |
- * | NORMAL                   | DMA ZONE END and NORMAL ZONE START (0x1000000)
- * | NORMAL                   |
- * | NORMAL                   |
- * | HIGH                     | NORMAL ZONE END and HIGH ZONE START (0x38000000)
- * | HIGH                     |
- * | HIGH                     |
- * | HIGH                     | HIGH ZONE END (0x100000000)
- * ----------------------------
+ * The VMA area is used to allocate large amounts of memory for kernel, since it is not always possible to allocate a large non-contiguous piece of physical memory.
+ * Also, all stuff (used by drivers, like ACPI tables) from HIGH physical memory are mapped to this area.
+ * PD is also mapped here.
  * 
  *     Virtual Address Space Layout
- * ---------------------------- 0xC0000000
- * |         RESERVED         |
- * | DMA   KERNEL BINARY      | 0xC0100000 DMA ZONE START and kernel binary address
- * | DMA   KERNEL BINARY      | (kernel sections) (size: < 4 MB)
- * | DMA                      |
- * | NORMAL                   | DMA ZONE END and NORMAL ZONE START (0xC1000000)
- * | NORMAL                   |
- * | NORMAL                   |
- * | VMA                      | NORMAL ZONE END and VMA START (0xF8000000)
- * | VMA                      |
- * | VMA                      | VMA VMA END 0x100000000
- * ----------------------------
- * 
- * The VMA area is used to allocate large amounts of memory, since it is not always possible to allocate a large non-contiguous piece of physical memory.
- * Also, all stuff (used by drivers, like ACPI tables) from HIGH memory are mapped to this area.
- * PD is also mapped here.
+ * 0x0
+ * USERSPACE | V86 MODE:            1 MB
+ * USERSPACE | USERSPACE:           3071 MB
+ * 0xC0000000
+ * KERNEL    | DMA zone mapping:    16 MB
+ * KERNEL    | NORMAL zone mapping: 880 MB
+ * KERNEL    | VMA:                 124 MB
+ * KERNEL    | PD self mapping:     4 MB
+ * 0x100000000
  */
 
-#define DMA_ZONE_START_PA 0x100000
-#define DMA_ZONE_END_PA 0x1000000
-#define NORMAL_ZONE_START_PA 0x1000000
-#define NORMAL_ZONE_END_PA 0x38000000
-#define HIGH_ZONE_START_PA 0x38000000
-#define HIGH_ZONE_END_PA 0x100000000
+// Physical Address Space
+#define REAL_MODE_START_PA 0 * 1024 * 1024 // 0x0
+#define REAL_MODE_END_PA 1 * 1024 * 1024 // 0x100000
+#define DMA_ZONE_START_PA 1 * 1024 * 1024 // 0x100000
+#define DMA_ZONE_END_PA 16 * 1024 * 1024 // 0x1000000
+#define NORMAL_ZONE_START_PA 16 * 1024 * 1024 // 0x1000000
+#define NORMAL_ZONE_END_PA 896 * 1024 * 1024 // 0x38000000
+#define HIGH_ZONE_START_PA 896 * 1024 * 1024 // 0x38000000
+#define HIGH_ZONE_END_PA 4096ll * 1024 * 1024 // 0x100000000
 
+// Virtual Address Space
 #define DMA_ZONE_START_VA KERNEL_PA_TO_VA(DMA_ZONE_START_PA) // 0xC0100000
 #define DMA_ZONE_END_VA KERNEL_PA_TO_VA(DMA_ZONE_END_PA)// 0xC1000000
 #define NORMAL_ZONE_START_VA KERNEL_PA_TO_VA(NORMAL_ZONE_START_PA) // 0xC1000000
 #define NORMAL_ZONE_END_VA KERNEL_PA_TO_VA(NORMAL_ZONE_END_PA) // 0xF8000000
-//#define VMA_START_VA 0xF8000000
-//#define VMA_END_VA 0x100000000
+#define VMA_START_VA 896 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET // 0xF8000000
+#define VMA_END_VA 1020 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET // 0xFFC00000
+#define PD_SELF_MAPPING_START_VA 1020 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET // 0xFFC00000
+#define PD_SELF_MAPPING_END_VA 1024 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET // 0x100000000ll
 
 /*
  * The numbers of the physical frames defining the zones. Useful for initializing bootstrap bitmap allocator.
  * Attention: max pfn is also included in the zone and means the number of the last page in it.
  */
-#define DMA_ZONE_MIN_PFN DMA_ZONE_START_PA / PAGE_SIZE
-#define DMA_ZONE_MAX_PFN DMA_ZONE_END_PA / PAGE_SIZE - 1
-#define NORMAL_ZONE_MIN_PFN NORMAL_ZONE_START_PA / PAGE_SIZE
-#define NORMAL_ZONE_MAX_PFN NORMAL_ZONE_END_PA / PAGE_SIZE - 1
-#define HIGH_ZONE_MIN_PFN HIGH_ZONE_START_PA / PAGE_SIZE
-#define HIGH_ZONE_MAX_PFN HIGH_ZONE_END_PA / PAGE_SIZE - 1
+#define DMA_ZONE_MIN_PFN DMA_ZONE_START_PA / PAGE_SIZE // 256
+#define DMA_ZONE_MAX_PFN DMA_ZONE_END_PA / PAGE_SIZE - 1 // 4095
+#define NORMAL_ZONE_MIN_PFN NORMAL_ZONE_START_PA / PAGE_SIZE // 4096
+#define NORMAL_ZONE_MAX_PFN NORMAL_ZONE_END_PA / PAGE_SIZE - 1 // 229375
+#define HIGH_ZONE_MIN_PFN HIGH_ZONE_START_PA / PAGE_SIZE // 229376
+#define HIGH_ZONE_MAX_PFN (uint32_t)(HIGH_ZONE_END_PA / PAGE_SIZE - 1) // 1048575
 
 /* 
  * Declared in the linker script
