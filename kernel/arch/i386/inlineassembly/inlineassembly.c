@@ -48,6 +48,6 @@ inline void irqrestore(uint32_t flags)
 inline uint32_t read_cr3(void)
 {
     uint32_t cr3 = 0;
-    asm volatile ("mov %0, cr3" : "=rm"(cr3) : : "memory");
+    asm volatile ("mov %0, cr3" : "=r"(cr3) : : "memory");
     return cr3;
 }
