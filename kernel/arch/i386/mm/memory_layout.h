@@ -5,8 +5,8 @@
 #include "mm.h"
 
 #define KERNEL_PA_TO_VA_OFFSET 0xC0000000
-#define KERNEL_PA_TO_VA(pa) ((pa) + KERNEL_PA_TO_VA_OFFSET)
-#define KERNEL_VA_TO_PA(va) ((va) - KERNEL_PA_TO_VA_OFFSET)
+#define KERNEL_PA_TO_VA(pa) ((uintptr_t)((pa)) + KERNEL_PA_TO_VA_OFFSET)
+#define KERNEL_VA_TO_PA(va) ((uintptr_t)((va)) - KERNEL_PA_TO_VA_OFFSET)
 
 /*
  * Variables and constants required for memory management
@@ -72,35 +72,35 @@
  */
 
 // Physical Address Space
-#define REAL_MODE_START_PA 0 * 1024 * 1024 // 0x0
-#define REAL_MODE_END_PA 1 * 1024 * 1024 // 0x100000
-#define DMA_ZONE_START_PA 1 * 1024 * 1024 // 0x100000
-#define DMA_ZONE_END_PA 16 * 1024 * 1024 // 0x1000000
-#define NORMAL_ZONE_START_PA 16 * 1024 * 1024 // 0x1000000
-#define NORMAL_ZONE_END_PA 896 * 1024 * 1024 // 0x38000000
-#define HIGH_ZONE_START_PA 896 * 1024 * 1024 // 0x38000000
-#define HIGH_ZONE_END_PA 4096ll * 1024 * 1024 // 0x100000000
+#define REAL_MODE_START_PA ((uintptr_t)(0 * 1024 * 1024)) // 0x0
+#define REAL_MODE_END_PA ((uintptr_t)(1 * 1024 * 1024)) // 0x100000
+#define DMA_ZONE_START_PA ((uintptr_t)(1 * 1024 * 1024)) // 0x100000
+#define DMA_ZONE_END_PA ((uintptr_t)(16 * 1024 * 1024)) // 0x1000000
+#define NORMAL_ZONE_START_PA ((uintptr_t)(16 * 1024 * 1024)) // 0x1000000
+#define NORMAL_ZONE_END_PA ((uintptr_t)(896 * 1024 * 1024)) // 0x38000000
+#define HIGH_ZONE_START_PA ((uintptr_t)(896 * 1024 * 1024)) // 0x38000000
+#define HIGH_ZONE_END_PA ((uintptr_t)(4096ll * 1024 * 1024)) // 0x100000000
 
 // Virtual Address Space
-#define DMA_ZONE_START_VA KERNEL_PA_TO_VA(DMA_ZONE_START_PA) // 0xC0100000
-#define DMA_ZONE_END_VA KERNEL_PA_TO_VA(DMA_ZONE_END_PA)// 0xC1000000
-#define NORMAL_ZONE_START_VA KERNEL_PA_TO_VA(NORMAL_ZONE_START_PA) // 0xC1000000
-#define NORMAL_ZONE_END_VA KERNEL_PA_TO_VA(NORMAL_ZONE_END_PA) // 0xF8000000
-#define VMA_START_VA 896 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET // 0xF8000000
-#define VMA_END_VA 1020 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET // 0xFFC00000
-#define PD_SELF_MAPPING_START_VA 1020 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET // 0xFFC00000
-#define PD_SELF_MAPPING_END_VA 1024 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET // 0x100000000ll
+#define DMA_ZONE_START_VA ((uintptr_t)(KERNEL_PA_TO_VA(DMA_ZONE_START_PA))) // 0xC0100000
+#define DMA_ZONE_END_VA ((uintptr_t)(KERNEL_PA_TO_VA(DMA_ZONE_END_PA)))// 0xC1000000
+#define NORMAL_ZONE_START_VA KERNEL_PA_TO_VA(NORMAL_ZONE_START_PA))) // 0xC1000000
+#define NORMAL_ZONE_END_VA KERNEL_PA_TO_VA(NORMAL_ZONE_END_PA))) // 0xF8000000
+#define VMA_START_VA ((uintptr_t)((896 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET))) // 0xF8000000
+#define VMA_END_VA ((uintptr_t)((1020 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET))) // 0xFFC00000
+#define PD_SELF_MAPPING_START_VA ((uintptr_t)((1020 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET))) // 0xFFC00000
+#define PD_SELF_MAPPING_END_VA ((uintptr_t)((1024 * 1024 * 1024 + KERNEL_PA_TO_VA_OFFSET))) // 0x100000000ll
 
 /*
  * The numbers of the physical frames defining the zones. Useful for initializing bootstrap bitmap allocator.
  * Attention: max pfn is also included in the zone and means the number of the last page in it.
  */
-#define DMA_ZONE_MIN_PFN DMA_ZONE_START_PA / PAGE_SIZE // 256
-#define DMA_ZONE_MAX_PFN DMA_ZONE_END_PA / PAGE_SIZE - 1 // 4095
-#define NORMAL_ZONE_MIN_PFN NORMAL_ZONE_START_PA / PAGE_SIZE // 4096
-#define NORMAL_ZONE_MAX_PFN NORMAL_ZONE_END_PA / PAGE_SIZE - 1 // 229375
-#define HIGH_ZONE_MIN_PFN HIGH_ZONE_START_PA / PAGE_SIZE // 229376
-#define HIGH_ZONE_MAX_PFN (uint32_t)(HIGH_ZONE_END_PA / PAGE_SIZE - 1) // 1048575
+#define DMA_ZONE_MIN_PFN (DMA_ZONE_START_PA / PAGE_SIZE) // 256
+#define DMA_ZONE_MAX_PFN (DMA_ZONE_END_PA / PAGE_SIZE - 1) // 4095
+#define NORMAL_ZONE_MIN_PFN (NORMAL_ZONE_START_PA / PAGE_SIZE) // 4096
+#define NORMAL_ZONE_MAX_PFN (NORMAL_ZONE_END_PA / PAGE_SIZE - 1) // 229375
+#define HIGH_ZONE_MIN_PFN (HIGH_ZONE_START_PA / PAGE_SIZE) // 229376
+#define HIGH_ZONE_MAX_PFN (HIGH_ZONE_END_PA / PAGE_SIZE - 1) // 1048575
 
 /* 
  * Declared in the linker script

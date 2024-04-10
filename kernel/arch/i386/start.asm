@@ -99,10 +99,10 @@ _start:
     mov edi, (_kernel_end - 0xC0000000)
     sub edi, _kernel_start
 
-    ; Check whether the whole kernel will fit into one page table (3 MiB) (First 1 MB reserved by )
-    ; 768 pages it's 3 MiB (1 page for VGA video mem)
+    ; Check whether the whole kernel will fit into one page table (3 MB) (First 1 MB reserved)
+    ; 768 pages it's 3 MB (1 page for VGA video mem)
     cmp edi, 4096 * (768 - 1)
-    ; halt if the kernel size is more than 3 MiB
+    ; halt if the kernel size is more than 3 MB
     jge higher_half.halt
 
     ; I want to copy the multiboot info to the bss
