@@ -4,13 +4,13 @@
 
 inline void outb(uint16_t port, uint8_t byte)
 {
-    asm volatile ("outb %0, %1" : : "d"(port), "a"(byte) : "memory");
+    asm volatile ("out %0, %1" : : "dN"(port), "a"(byte) : "memory");
 }
 
 inline uint8_t inb(uint16_t port)
 {
     uint8_t ret = 0;
-    asm volatile ("inb %0, %1" : "=a"(ret) : "d"(port) : "memory");
+    asm volatile ("in %0, %1" : "=a"(ret) : "dN"(port) : "memory");
     return ret;
 }
 
@@ -24,7 +24,7 @@ inline bool are_interrupts_enabled(void)
     uint32_t flags = 0;
     asm volatile ("pushf\n\t"
                   "pop %0"
-                  : "=rm"(flags) : : "memory" );
+                  : "=g"(flags) : : "memory" );
     return flags & (1 << 9);
 }
 
@@ -34,7 +34,7 @@ inline uint32_t save_irqdisable(void)
     asm volatile ("pushf\n\t"
                   "cli\n\t"
                   "pop %0"
-                  : "=r"(flags) : : "memory");
+                  : "=g"(flags) : : "memory");
     return flags;
 }
 
@@ -42,7 +42,7 @@ inline void irqrestore(uint32_t flags)
 {
     asm volatile ("push %0\n\t"
                   "popf"
-                   : : "r"(flags) : "memory", "cc");
+                   : : "g"(flags) : "memory", "cc");
 }
 
 inline uint32_t read_cr3(void)
