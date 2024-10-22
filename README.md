@@ -1,6 +1,8 @@
 # TEUOS
 This is a self-written 32-bit protected mode kernel for the x86 architecture, written as a pet project with the desire to explore and implement operating system principles in great detail.
 
+### The project is abandoned because I got bored of writing in C and decided to switch to Rust. There is an actual Rust OS project among my repositories.
+
 ## How to run it in a virtual machine
 All you need to do is download *bootablekernel.iso* and run it in any virtual machine.  
 For example in qemu:
